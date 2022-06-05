@@ -1,0 +1,70 @@
+
+<form [formGroup]="essay" #form="ngForm" (ngSubmit)="OnSubmit()">
+  <div class="row g-3 mb-4">
+    <div class="col-md-12">
+      <label class="form-label">Question</label>
+      <div *ngIf="(form.submitted || question.touched) && question.errors"
+           class="custom-inline invalid-feedback mx-3">
+        <ng-container *ngIf="question.errors.required else elseMin">
+          This field is required
+        </ng-container>
+        <ng-template #elseMin>
+          The minimum number of characters required is {{ question.errors.minlength.requiredLength }}
+        </ng-template>
+        <i class="bi bi-exclamation-circle"></i>
+      </div>
+      <angular-editor formControlName="question" [config]="_editorConfig"></angular-editor>
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">Settings</label>
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-6">
+              <label for="category" class="form-label">Category</label>
+              <select class="form-select form-select-sm" id="category" [attr.disabled]="loading ? true : null"
+                      formControlName="category" (change)="OnCategoryChange()">
+                <option *ngFor="let option of _categories" [value]="option.Id">{{ option.Name }}</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label for="sub-category" class="form-label">SubCategory</label>
+              <select class="form-select form-select-sm" id="sub-category" [attr.disabled]="loading ? true : null"
+                      formControlName="subCategory">
+                <option *ngFor="let option of _subCategories" [value]="option.Id">{{ option.Name }}</option>
+              </select>
+            </div>
+
+            <div class="col-6">
+              <label for="points" class="form-label">Points Available</label>
+              <div *ngIf="(form.submitted || points.touched) && points.errors"
+                   class="custom-inline invalid-feedback mx-3">
+                <ng-container *ngIf="points.errors.mustBeANumber">
+                  Must be a number
+                </ng-container>
+                <ng-container *ngIf="points.errors.mustBeStrictlyPositif">
+                  Must be a strictly positif
+                </ng-container>
+                <i class="bi bi-exclamation-circle"></i>
+              </div>
+              <input class="form-control form-control-sm" id="points" formControlName="points" [readonly]="loading">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12">
+      <button type="submit" class="btn btn-sm btn-outline-primary" [disabled]="submitting || loading">
+        <ng-container *ngIf="!submitting else Loading">
+          Submit
+        </ng-container>
+        <ng-template #Loading>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Submitting...
+        </ng-template>
+      </button>
+    </div>
+  </div>
+</form>

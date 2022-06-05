@@ -1,0 +1,16 @@
+
+
+<div class="modal-header">
+  <div class="modal-title">{{ title }}</div>
+  <button type="button" class="btn-close" (click)="activeModal.close(0)"></button>
+</div>
+<div class="modal-body">
+  <p>
+    {{ content }}
+  </p>
+</div>
+<div class="modal-footer">
+  <button type="submit" class="btn btn-sm btn-danger" (click)="activeModal.close(1)">Confirm</button>
+  <button type="button" class="btn btn-sm btn-outline-dark" (click)="activeModal.close(0)">Cancel</button>
+</div>
+

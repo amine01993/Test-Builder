@@ -1,0 +1,199 @@
+
+<!-- question filter -->
+<div class="col-12">
+  <form [formGroup]="filterForm" #form="ngForm" (ngSubmit)="OnFilterSubmit()">
+    <div class="card">
+      <div class="card-body">
+        <div class="row row align-items-end">
+          <div class="col">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select form-select-sm" id="status" formControlName="status">
+              <option [value]="0">All</option>
+              <option [value]="1">Used</option>
+              <option [value]="2">Unused</option>
+            </select>
+          </div>
+          <div class="col">
+            <label for="questionType" class="form-label">Question Type</label>
+            <select class="form-select form-select-sm" id="questionType" formControlName="questionType">
+              <option [value]="0">All</option>
+              <option *ngFor="let option of questionTypes" [value]="option.Id">{{ option.Name }}</option>
+            </select>
+          </div>
+
+          <div class="col">
+            <label for="category" class="form-label">Category</label>
+            <select class="form-select form-select-sm" id="category"
+                    (change)="OnCategoryChange()" formControlName="category">
+              <option [value]="0">All</option>
+              <option *ngFor="let option of _categories" [value]="option.Id">{{ option.Name }}</option>
+            </select>
+          </div>
+
+          <div class="col">
+            <label for="subCategory" class="form-label">SubCategory</label>
+            <select class="form-select form-select-sm" id="subCategory" formControlName="subCategory">
+              <option [value]="0">All</option>
+              <option *ngFor="let option of _subCategories" [value]="option.Id">{{ option.Name }}</option>
+            </select>
+          </div>
+
+          <div class="col">
+            <label for="searchTerm" class="form-label">Search Term</label>
+            <input class="form-control form-control-sm" id="searchTerm" formControlName="searchTerm" />
+          </div>
+
+          <div class="col">
+            <button class="btn btn-sm btn-outline-success">
+              <ng-container *ngIf="!searching else Searching">
+                Search <i class="bi bi-search"></i>
+              </ng-container>
+              <ng-template #Searching>
+                <span class="spinning-border spinning-border-sm" role="status"></span>
+                Searching...
+              </ng-template>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- pagination (page number + page size) -->
+<div *ngIf="questions.length > 0" class="row my-2">
+  <div class="d-flex justify-content-between">
+    <div class="row">
+      <div class="col-auto">
+        <label for="page-number" class="form-label">
+          Page
+        </label>
+      </div>
+      <div class="col-auto">
+        <select id="page-number" class="form-select form-select-sm"
+                [formControl]="pageControl" (change)="OnPageChange()">
+          <option *ngFor="let page of pages;" [value]="page">{{ page }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-auto">
+        <button class="btn btn-link btn-sm" (click)="OnPreviousPage()" [disabled]="page === 1">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+        <button class="btn btn-link btn-sm" (click)="OnNextPage()" [disabled]="page === pages[pages.length - 1]">
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-auto">
+        <label for="page-size-number" class="form-label">
+          Page size
+        </label>
+      </div>
+      <div class="col-auto">
+        <select id="page-size-number" class="form-select form-select-sm"
+                [formControl]="pageSizeControl" (change)="OnPageSizeChange()">
+          <option *ngFor="let pageSize of pageSizes;" [value]="pageSize">{{ pageSize }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- actions -->
+<div class="row">
+  <div class="col-12 text-end">
+    <!-- add questions -->
+    <div class="btn-group">
+      <button type="button" class="btn btn-sm btn-primary dropdown-toggle"
+              data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-plus-lg"></i> Add Questions
+      </button>
+      <ul class="dropdown-menu">
+        <!-- add a new question -->
+        <li><a class="dropdown-item" routerLink="/add-question/0">Add a new question</a></li>
+        <!-- import spreadsheet .csv -->
+        <li><a class="dropdown-item" href="#">Import spreadsheet (.CSV)</a></li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- search results -->
+<div class="row m-2 mb-5 g-3">
+  <div *ngFor="let question of questions; let j = index;" class="col-12 p-0">
+    <div class="row g-3 shadow-sm">
+      <!--<div class="col-1">
+        <i class="bi bi-arrow-down-up" style="cursor: move;" cdkDragHandle></i>
+      </div>-->
+      <div class="col-9">
+        <div class="row">
+          <div class="col-12" [innerHTML]="question.Question">
+            <!-- question -->
+          </div>
+          <ng-container *ngIf="question.Answers">
+            <div *ngFor="let answer of question.Answers; let i = index;" class="col-12 mx-3 p-1"
+                 [class.correct]="answer.Correct">
+              <!-- display answers + highlight right answers -->
+              <!-- Multiple choice -->
+              <ng-container *ngIf="question.TypeId === 1">
+                <div class="form-check">
+                  <input [type]="question.Selection ? 'checkbox' : 'radio'"
+                         class="form-check-input" [id]="'answer' + j + '-' + i" [name]="'answer' + j" />
+                  <label class="form-check-label" [for]="'answer' + j + '-' + i" [innerHTML]="answer._Answer"></label>
+                </div>
+              </ng-container>
+              <!-- True False -->
+              <ng-container *ngIf="question.TypeId === 2">
+                <div class="form-check">
+                  <input type="radio"
+                         class="form-check-input" [id]="'answer' + j + '-' + i" [name]="'answer' + j" />
+                  <label class="form-check-label" [for]="'answer' + j + '-' + i" [innerHTML]="answer._Answer"></label>
+                </div>
+              </ng-container>
+              <!-- Matching -->
+              <ng-container *ngIf="question.TypeId === 3">
+                <div class="row">
+                  <div class="col-5" [innerHTML]="answer._Answer"></div>
+                  <div class="col-2">
+                    <i class="bi bi-arrow-right"></i>
+                  </div>
+                  <div class="col-5" [innerHTML]="answer.Match"></div>
+                </div>
+              </ng-container>
+              <!-- Free Text -->
+              <ng-container *ngIf="question.TypeId === 4">
+                <span [innerHTML]="answer._Answer"></span>
+              </ng-container>
+              <!-- Essay -->
+              <ng-container *ngIf="question.TypeId === 5">
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="col-3 text-end">
+        <!-- add question -->
+        <a [routerLink]="getEditRoute(question)" class="btn btn-sm btn-success me-1" title="Edit Question">
+          <i class="bi bi-pencil-fill"></i>
+        </a>
+        <button class="btn btn-sm btn-light me-1" title="Duplicate Question">
+          <i class="bi bi-files"></i>
+        </button>
+        <!-- delete question if used -->
+        <button class="btn btn-sm btn-danger" title="Delete Question" (click)="OnDeleteQuestion(question)">
+          <i class="bi bi-trash-fill"></i>
+        </button>
+        <br />
+        <button class="btn btn-sm btn-link mt-2" title="Tests Used In">
+          <i class="bi bi-cursor-fill"></i> Used In
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

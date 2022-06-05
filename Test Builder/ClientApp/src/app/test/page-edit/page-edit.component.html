@@ -1,0 +1,121 @@
+
+<div *ngIf="page" class="row align-items-end p-2">
+
+    <!-- page name -->
+    <!-- page properties (limit + shuffle) -->
+    <!-- page actions (preview + config + delete) -->
+
+    <div class="col-3">
+      {{ page.Name }}
+    </div>
+    <div class="col-3 fw-light text-end">
+      <ng-container *ngIf="page!.Limit">
+        {{ page.Limit }} seconds
+        <i class="bi bi-clock-fill"></i>
+      </ng-container>
+      <ng-container *ngIf="page!.Shuffle">
+        &nbsp;
+        <i class="bi bi-shuffle"></i>
+      </ng-container>
+    </div>
+    <div class="col-6 pe-0 text-end">
+
+      <div class="form-check form-check-inline">
+        <input type="checkbox" class="form-check-input" id="preview" [formControl]="preview" />
+        <label class="form-check-label" for="preview">Preview</label>
+      </div>
+
+      <button class="btn btn-sm btn-light me-1" (click)="OnEditPageSettings()">
+        <i class="bi bi-gear-fill"></i>
+      </button>
+      <button class="btn btn-sm btn-danger me-1" (click)="OnDeletePage()">
+        <i class="bi bi-trash-fill"></i>
+      </button>
+
+      <button class="btn btn-sm btn-primary dropdown-toggle" id="add-question-menu" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-plus"></i> Add Question
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="add-question-menu">
+        <li>
+          <a class="dropdown-item" [routerLink]="['/add-question', page!.Id]">Add a new question</a>
+        </li>
+        <li><button class="dropdown-item" type="button">Reuse from your question bank</button></li>
+        <li><button class="dropdown-item" type="button">Add random questions</button></li>
+      </ul>
+
+    </div>
+
+</div>
+
+<form [formGroup]="pageForm">
+  <div class="row page-drop-boundary m-2 mb-5 g-3" cdkDropList (cdkDropListDropped)="drop($event)" formArrayName="positions">
+    <div *ngFor="let testQuestion of testQuestions; let j = index;" class="col-12 p-0"
+         cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".page-drop-boundary">
+      <div class="row g-3 shadow-sm">
+        <div class="col-1">
+          <i class="bi bi-arrow-down-up" style="cursor: move;" cdkDragHandle></i>
+        </div>
+        <div class="col-8">
+          <div class="row">
+            <div class="col-12 p-1" [innerHTML]="testQuestion.Question">
+              <!-- question -->
+            </div>
+            <ng-container *ngIf="testQuestion.Answers">
+              <div *ngFor="let answer of testQuestion.Answers; let i = index;" class="col-12 p-1"
+                   [class.correct]="answer.Correct">
+                <!-- display answers + highlight right answers -->
+                <!-- Multiple choice -->
+                <ng-container *ngIf="testQuestion.TypeId === 1">
+                  <div class="form-check">
+                    <input [type]="testQuestion.Selection ? 'checkbox' : 'radio'"
+                           class="form-check-input" [id]="'answer' + j + '-' + i" [name]="'answer' + j" />
+                    <label class="form-check-label" [for]="'answer' + j + '-' + i" [innerHTML]="answer._Answer"></label>
+                  </div>
+                </ng-container>
+                <!-- True False -->
+                <ng-container *ngIf="testQuestion.TypeId === 2">
+                  <div class="form-check">
+                    <input type="radio"
+                           class="form-check-input" [id]="'answer' + j + '-' + i" [name]="'answer' + j" />
+                    <label class="form-check-label" [for]="'answer' + j + '-' + i" [innerHTML]="answer._Answer"></label>
+                  </div>
+                </ng-container>
+                <!-- Matching -->
+                <ng-container *ngIf="testQuestion.TypeId === 3">
+                  <div class="row">
+                    <div class="col-5" [innerHTML]="answer._Answer"></div>
+                    <div class="col-2">
+                      <i class="bi bi-arrow-right"></i>
+                    </div>
+                    <div class="col-5" [innerHTML]="answer.Match"></div>
+                  </div>
+                </ng-container>
+                <!-- Free Text -->
+                <ng-container *ngIf="testQuestion.TypeId === 4">
+                  <span [innerHTML]="answer._Answer"></span>
+                </ng-container>
+                <!-- Essay -->
+                <ng-container *ngIf="testQuestion.TypeId === 5">
+                </ng-container>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+        <div class="col-3 text-end">
+          <!-- set positon manually -->
+          <select class="form-select form-select-sm d-inline me-1" style="width: fit-content;"
+                  formControlName="{{ testQuestion.Position }}"
+                  (change)="OnChangePosition(testQuestion, j)">
+            <option *ngFor="let _el of testQuestions; let k = index;" [value]="_el.Position">#{{ _el.Position }}</option>
+          </select>
+          <!-- edit question -->
+          <button class="btn btn-sm btn-success me-1"><i class="bi bi-pencil-fill"></i></button>
+          <!-- delete question from page -->
+          <button class="btn btn-sm btn-danger" (click)="OnDeleteQuestion(testQuestion)">
+            <i class="bi bi-trash-fill"></i>
+          </button>
+        </div>
+      </div>
+      </div>
+    </div>
+</form>

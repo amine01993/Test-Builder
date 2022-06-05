@@ -1,0 +1,75 @@
+
+<form [formGroup]="register" #form="ngForm" (ngSubmit)="OnSubmit()">
+  <div class="modal-header">
+    <div class="modal-title">Register</div>
+    <button type="button" class="btn-close" (click)="activeModal.close()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div *ngFor="let error of serverErrors | keyvalue" class="col-12">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ error.key }}
+          <ul>
+            <li *ngFor="let err of error.value">{{ err }}</li>
+          </ul>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="col-12">
+        <label for="name" class="form-label">Name</label>
+        <input id="name" class="form-control form-control-sm" formControlName="name"
+               [class.is-invalid]="(form.submitted || name.touched) && name.errors" />
+        <div *ngIf="(form.submitted || name.touched) && name.errors" class="invalid-feedback">
+          <ng-container *ngIf="name.errors.required">
+            This field is required
+          </ng-container>
+        </div>
+      </div>
+      <div class="col-12">
+        <label for="email" class="form-label">Email address</label>
+        <input id="email" class="form-control form-control-sm" formControlName="email"
+               [class.is-invalid]="(form.submitted || email.touched) && email.errors" />
+        <div *ngIf="(form.submitted || email.touched) && email.errors" class="invalid-feedback">
+          <ng-container *ngIf="email.errors.required else otherError">
+            This field is required
+          </ng-container>
+          <ng-template #otherError>
+            Invalid email
+          </ng-template>
+        </div>
+      </div>
+      <div class="col-12">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" class="form-control form-control-sm" formControlName="password" type="password"
+               [class.is-invalid]="(form.submitted || password.touched) && password.errors" />
+        <div *ngIf="(form.submitted || password.touched) && password.errors" class="invalid-feedback">
+          <ng-container *ngIf="password.errors.required else otherError">
+            This field is required
+          </ng-container>
+          <ng-template #otherError>
+            Password must have at least {{ password.errors.minlength.requiredLength }} characters
+          </ng-template>
+        </div>
+      </div>
+      <div class="col-12">
+        <label for="confirmPassword" class="form-label">Confirm password</label>
+        <input id="confirmPassword" class="form-control form-control-sm" formControlName="confirmPassword" type="password"
+               [class.is-invalid]="(form.submitted || confirmPassword.touched) && (confirmPassword.errors || register.errors)" />
+        <div *ngIf="(form.submitted || confirmPassword.touched) && (confirmPassword.errors || register.errors)" class="invalid-feedback">
+          <ng-container *ngIf="confirmPassword.errors && confirmPassword.errors.required else otherError">
+            This field is required
+          </ng-container>
+          <ng-template #otherError>
+            <ng-container *ngIf="register.errors && register.errors.passwordMismatch">
+              Passwords don't match
+            </ng-container>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-sm btn-outline-primary">Submit</button>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeModal.close()">Close</button>
+  </div>
+</form>

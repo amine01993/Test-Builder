@@ -1,0 +1,54 @@
+
+<div class="card">
+  <div class="card-body">
+    <form [formGroup]="test" #form="ngForm" (ngSubmit)="OnSubmit()">
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label" for="testname">Test name</label>
+          <div *ngIf="(form.submitted || name.touched) && name.errors"
+               class="invalid-feedback mx-3">
+            <ng-container *ngIf="name.errors.required else elseMin">
+              This field is required
+            </ng-container>
+            <ng-template #elseMin>
+              The minimum number of characters required is {{ name.errors.minlength.requiredLength }}
+            </ng-template>
+            <i class="bi bi-exclamation-circle"></i>
+          </div>
+          <input class="form-control form-control-sm" id="testname" formControlName="name" />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="category">Category</label>
+          <select class="form-select form-select-sm" id="category" formControlName="category"(change)="OnCategoryChange()">
+            <option *ngFor="let option of _categories" [value]="option.Id">{{ option.Name }}</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="subCategory">Subcategory</label>
+          <select class="form-select form-select-sm" id="subCategory" formControlName="subCategory">
+            <option *ngFor="let option of _subCategories" [value]="option.Id">{{ option.Name }}</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Introduction</label>
+          <angular-editor [config]="_editorConfig" formControlName="introduction"></angular-editor>
+        </div>
+
+        <div class="col-12">
+          <button type="submit" class="btn btn-sm btn-outline-primary" [disabled]="submitting">
+            <ng-container *ngIf="!submitting else Loading">
+              Start Adding Questions
+            </ng-container>
+            <ng-template #Loading>
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Submitting...
+            </ng-template>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

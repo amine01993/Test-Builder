@@ -1,0 +1,60 @@
+<header>
+  <nav
+    class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
+  >
+    <div class="container">
+      <a class="navbar-brand" [routerLink]="['/']">Test Builder</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target=".navbar-collapse"
+        aria-label="Toggle navigation"
+        [attr.aria-expanded]="isExpanded"
+        (click)="toggle()"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div
+        class="navbar-collapse collapse d-sm-inline-flex justify-content-end"
+        [ngClass]="{ show: isExpanded }"
+      >
+        <ul class="navbar-nav flex-grow">
+          <li class="nav-item" routerLinkActive="link-active">
+            <a class="nav-link text-dark" [routerLink]="['/test-add']">Add Test</a>
+          </li>
+          <li class="nav-item" routerLinkActive="link-active">
+            <a class="nav-link text-dark" [routerLink]="['/add-question', 0]">Add Question</a>
+          </li>
+          <li class="nav-item" routerLinkActive="link-active">
+            <a class="nav-link text-dark" [routerLink]="['/category']">Categories</a>
+          </li>
+          <ng-container *ngIf="data.loggedIn else Anonymous">
+            <li class="nav-item" routerLinkActive="link-active">
+              <a class="nav-link text-dark" href="javascript:void(0)">
+                {{ data.name }}
+              </a>
+            </li>
+            <li class="nav-item" routerLinkActive="link-active">
+              <a class="nav-link text-dark" href="javascript:void(0)" title="Logout" (click)="Logout()">
+                <i class="bi bi-box-arrow-right"></i>
+              </a>
+            </li>
+          </ng-container>
+          <ng-template #Anonymous>
+            <li class="nav-item" routerLinkActive="link-active">
+              <a class="nav-link text-dark" href="javascript:void(0)" title="Login" (click)="showModal('login')">
+                <i class="bi bi-person-fill"></i>
+              </a>
+            </li>
+            <li class="nav-item" routerLinkActive="link-active">
+              <a class="nav-link text-dark" href="javascript:void(0)" title="Register" (click)="showModal('register')">
+                <i class="bi bi-person-plus-fill"></i>
+              </a>
+            </li>
+          </ng-template>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

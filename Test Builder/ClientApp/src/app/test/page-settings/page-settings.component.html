@@ -1,0 +1,73 @@
+
+<form [formGroup]="pageForm" #form="ngForm" (ngSubmit)="OnSubmit()">
+
+  <div class="modal-header">
+    <div class="modal-title">Page Settings</div>
+    <button type="button" class="btn-close" (click)="activeModal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label" id="page-name">Name</label>
+        <input for="page-name" class="form-control form-control-sm"
+               formControlName="name" [class.is-invalid]="(form.submitted || name.touched) && name.errors" />
+        <div *ngIf="(form.submitted || name.touched) && name.errors"
+             class="invalid-feedback">
+          <ng-container *ngIf="name.errors.required else elseMax">
+            This field is required
+          </ng-container>
+          <ng-template #elseMax>
+            The maximum number of characters is {{ name.errors.maxlength.requiredLength }}
+          </ng-template>
+          <i class="bi bi-exclamation-circle"></i>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="form-check">
+          <input class="form-check-input" id="shuffle-questions" type="checkbox" formControlName="shuffle" />
+          <label class="form-check-label" for="shuffle-questions">Shuffle questions</label>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="form-check form-switch">
+          <input class="form-check-input" id="time-limit" type="checkbox" formControlName="timeLimit" />
+          <label class="form-check-label" for="time-limit">Time limit</label>
+        </div>
+      </div>
+      <div class="col-5">
+        <div *ngIf="timeLimit.value" class="input-group input-group-sm">
+          <input class="form-control form-control-sm"
+                 formControlName="limit" [class.is-invalid]="(form.submitted || limit.touched) && pageForm.errors">
+          <span class="input-group-text">{{ timeUnit }}</span>
+          <button class="btn btn-sm btn-outline-secondary" type="button" (click)="ChangeTimeUnit()">
+            <i class="bi bi-arrow-left-right"></i>
+          </button>
+          <div *ngIf="(form.submitted || limit.touched) && pageForm.errors"
+               class="invalid-feedback">
+            <ng-container *ngIf="pageForm.errors!.mustBeANumber">
+              Must be a number
+            </ng-container>
+            <ng-container *ngIf="pageForm.errors!.mustBeStrictlyPositif">
+              Must be strictly positiff
+            </ng-container>
+            <i class="bi bi-exclamation-circle"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-sm btn-outline-primary text-end" type="submit" [disabled]="submitting">
+      <ng-container *ngIf="!submitting else Loading">
+        Save
+      </ng-container>
+      <ng-template #Loading>
+        <div class="spinner-border spinner-border-sm" role="status"></div>
+        Saving...
+      </ng-template>
+    </button>
+  </div>
+
+</form>

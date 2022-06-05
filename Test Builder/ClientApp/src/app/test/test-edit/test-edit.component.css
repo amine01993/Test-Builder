@@ -1,0 +1,12 @@
+
+.question-actions {
+  border-top: 1px solid #6c757d;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

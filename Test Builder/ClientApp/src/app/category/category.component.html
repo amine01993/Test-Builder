@@ -1,0 +1,46 @@
+<div class="card">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-12" style="text-align: right;">
+        <button class="btn btn-sm btn-outline-warning mx-2" (click)="AddCategory(null)">
+          Add Category <i class="bi bi-plus"></i>
+        </button> 
+        <button class="btn btn-sm btn-outline-warning" (click)="AddSubCategory(null)">
+          Add Subcategory <i class="bi bi-plus"></i>
+        </button>
+      </div>
+      <div class="col-12">
+        <table class="table table-hover categories">
+          <tr *ngFor="let category of categories" [class.subcategory]="category.ParentId !== null">
+            <ng-container *ngIf="category.ParentId === null">
+              <th>{{ category.Name }}</th>
+              <th class="btn-actions">
+                <ng-container *ngIf="![1, 2].includes(category.Id)">
+                  <button class="btn btn-sm btn-outline-success mx-2" (click)="AddCategory(category)">
+                    Edit <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" #btn (click)="DeleteCategory(category, btn)">
+                    Delete <i class="bi bi-trash-fill"></i>
+                  </button>
+                </ng-container>
+              </th>
+            </ng-container>
+            <ng-container *ngIf="category.ParentId !== null">
+              <td>{{ category.Name }}</td>
+              <td class="btn-actions">
+                <ng-container *ngIf="![1, 2].includes(category.Id)">
+                  <button class="btn btn-sm btn-outline-success mx-2" (click)="AddSubCategory(category)">
+                    Edit <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" #btn (click)="DeleteCategory(category, btn)">
+                    Delete <i class="bi bi-trash-fill"></i>
+                  </button>
+                </ng-container>
+              </td>
+            </ng-container>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

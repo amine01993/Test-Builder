@@ -1,0 +1,25 @@
+
+table.categories th, table.categories td {
+    height: 2rem;
+}
+
+table.categories button {
+  padding-top: .25rem;
+  padding-bottom: .25rem;
+}
+
+.btn-actions{
+    text-align: right;
+}
+
+.subcategory td:first-child{
+    padding-left: 1.2rem;
+}
+
+.subcategory td.btn-actions {
+  padding-right: 1.2rem;
+}
+
+.table-hover tr:hover {
+  background-color: #21252912;
+}

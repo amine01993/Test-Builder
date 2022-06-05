@@ -1,0 +1,16 @@
+
+<div class="row">
+  <div class="col-md-3">
+    <div class="list-group">
+      <a *ngFor="let type of questionTypes;"
+         [routerLink]="type.Link" routerLinkActive="active"
+         class="list-group-item list-group-item-action">
+        <i *ngFor="let _icon of type.Icon|split:'|'" class="bi bi-{{ _icon }}"></i>
+        {{ type.Name }}
+      </a>
+    </div>
+  </div>
+  <div class="col-md-9">
+    <router-outlet></router-outlet>
+  </div>
+</div>

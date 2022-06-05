@@ -1,0 +1,102 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <SpaRoot>ClientApp\</SpaRoot>
+    <SpaProxyServerUrl>https://localhost:44430</SpaProxyServerUrl>
+    <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
+    <RootNamespace>Test_Builder</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="6.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Don't publish the SPA source files, but do show them in the project files list -->
+    <Content Remove="$(SpaRoot)**" />
+    <None Remove="$(SpaRoot)**" />
+    <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="ClientApp\src\app\authentication.interceptor.ts" />
+    <None Remove="ClientApp\src\app\authentication.model.ts" />
+    <None Remove="ClientApp\src\app\authentication.service.ts" />
+    <None Remove="ClientApp\src\app\category\category.model.ts" />
+    <None Remove="ClientApp\src\app\category\category.service.ts" />
+    <None Remove="ClientApp\src\app\editor.config.ts" />
+    <None Remove="ClientApp\src\app\pipes\array.pipe.ts" />
+    <None Remove="ClientApp\src\app\pipes\object-length.pipe.ts" />
+    <None Remove="ClientApp\src\app\pipes\split.pipe.ts" />
+    <None Remove="ClientApp\src\app\question-add\question.model.ts" />
+    <None Remove="ClientApp\src\app\question-add\question.service.ts" />
+    <None Remove="ClientApp\src\app\question-add\question.validator.ts" />
+    <None Remove="ClientApp\src\app\register\register.validator.ts" />
+    <None Remove="ClientApp\src\app\test\page-settings\page-settings.validator.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\authentication.interceptor.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\authentication.model.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\authentication.service.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\category\category.model.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\category\category.service.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\editor.config.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\pipes\array.pipe.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\app\pipes\object-length.pipe.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\app\pipes\split.pipe.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\question-add\question.model.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\question-add\question.service.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\question-add\question.validator.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\register\register.validator.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\test\page-settings\page-settings.validator.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClientApp\src\app\directives\" />
+  </ItemGroup>
+
+    <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
+    <!-- Ensure Node.js is installed -->
+    <Exec Command="node --version" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+    <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
+    <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+  </Target>
+  
+  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
+    <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build -- --prod" />
+
+    <!-- Include the newly-built files in the publish output -->
+    <ItemGroup>
+      <DistFiles Include="$(SpaRoot)dist\**; $(SpaRoot)dist-server\**" />
+      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>wwwroot\%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+</Project>

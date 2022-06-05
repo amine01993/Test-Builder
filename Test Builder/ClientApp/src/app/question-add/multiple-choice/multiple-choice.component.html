@@ -1,0 +1,177 @@
+
+<form [formGroup]="multipleChoice" #form="ngForm" (ngSubmit)="OnSubmit()">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <label class="form-label">Question</label>
+      <div *ngIf="(form.submitted || question.touched) && question.errors"
+           class="custom-inline invalid-feedback mx-3">
+        <ng-container *ngIf="question.errors.required else elseMin">
+          This field is required
+        </ng-container>
+        <ng-template #elseMin>
+          The minimum number of characters required is {{ question.errors.minlength.requiredLength }}
+        </ng-template>
+         <i class="bi bi-exclamation-circle"></i>
+      </div>
+      <angular-editor formControlName="question" [config]="_editorConfig"></angular-editor>
+    </div>
+
+    <div class="col-md-12 mt-3" formArrayName="answers">
+      <label class="form-label">Answers</label>
+      <div *ngFor="let answer of answers.controls; let i = index;" formGroupName="{{i}}" class="card mb-3">
+        <div class="card-body">
+          <div class="row g-3">
+
+            <div *ngIf="(form.submitted || answer.touched) && answer.errors" class="col-12 my-0">
+              <div class="custom-inline invalid-feedback">
+                <ng-container *ngIf="answer.errors.pointsMustBeANumber">
+                  Points must be a valid number
+                </ng-container>
+                <ng-container *ngIf="answer.errors.penaltyMustBeANumber">
+                  Penalty must be a valid number
+                </ng-container>
+                <ng-container *ngIf="answer.errors.penaltyMustBeInferiorThanPoints">
+                  Penalty must be inferior or equal to points
+                </ng-container>
+                <ng-container *ngIf="answer.errors.pointsMustBeStrictlySuperiorThanZero">
+                  Points must be strictly positif
+                </ng-container>
+                <ng-container *ngIf="answer.errors.penaltyMustBeSuperiorThanZero">
+                  Penalty must be positif
+                </ng-container>
+                <i class="bi bi-exclamation-circle"></i>
+              </div>
+            </div>
+
+            <div class="col-1"><b>({{ i + 1 }})</b></div>
+            <div class="col-3">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text" [style.color]="'green'"><i class="bi bi-plus"></i></span>
+                <input type="text" class="form-control" formControlName="points" (input)="RecalculatePoints()" [readonly]="loading">
+                <span class="input-group-text">pts</span>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text" [style.color]="'red'"><i class="bi bi-dash"></i></span>
+                <input type="text" class="form-control" formControlName="penalty" [readonly]="loading">
+                <span class="input-group-text">pts</span>
+              </div>
+            </div>
+
+            <div class="col-5" style="text-align: right;">
+              <button *ngIf="i > 1" type="button" class="btn btn-sm btn-outline-danger" [disabled]="loading"
+                      (click)="OnDeleteAnswer(i)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+
+            <div class="col-12">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkbox-{{i}}"
+                       formControlName="correct" (change)="RecalculatePoints()" [attr.disabled]="loading ? true : null">
+                <label class="form-check-label" for="checkbox-{{i}}">
+                  This answer option is correct
+                </label>
+              </div>
+            </div>
+
+            <div class="col-12 my-0">
+              <div *ngIf="(form.submitted || getAnswer(i).controls.answer.touched) && getAnswer(i).controls.answer.errors"
+                   class="custom-inline invalid-feedback">
+                <ng-container *ngIf="getAnswer(i).controls.answer.errors!.required">
+                  An answer is required
+                  <i class="bi bi-exclamation-circle"></i>
+                </ng-container>
+              </div>
+            </div>
+            <div class="col-12">
+              <angular-editor formControlName="answer" [config]="_editorConfig"></angular-editor>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body d-grid">
+          <button type="button" class="btn btn-sm btn-outline-info"
+                  (click)="AddMoreOptions()" [disabled]="loading">Add more answer options</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">Settings</label>
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="row g-3 align-items-end">
+            <div class="col-6">
+              <label for="category" class="form-label">Category</label>
+              <select class="form-select form-select-sm" id="category" formControlName="category"
+                      (change)="OnCategoryChange()" [attr.disabled]="loading ? true : null">
+                <option *ngFor="let option of _categories" [value]="option.Id">{{ option.Name }}</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label for="sub-category" class="form-label">SubCategory</label>
+              <select class="form-select form-select-sm" id="sub-category" [attr.disabled]="loading ? true : null"
+                      formControlName="subCategory">
+                <option *ngFor="let option of _subCategories" [value]="option.Id">{{ option.Name }}</option>
+              </select>
+            </div>
+
+            <div class="col-4">
+              <label for="points" class="form-label">Points Available</label>
+              <input class="form-control form-control-sm" id="points" formControlName="points" readonly>
+            </div>
+            <div class="col-4">
+              <button type="button" class="btn btn-sm btn-outline-warning" (click)="RecalculatePoints()">
+                Recalculate <i class="bi bi-arrow-repeat"></i>
+              </button>
+            </div>
+            <div class="w-100 mt-0"></div>
+
+            <div class="col-4">
+              <label class="form-label">Shuffle Answers</label>
+              <div class="form-check">
+                <input type="radio" class="form-check-input" id="shuffle-0"
+                       formControlName="shuffle" [value]="0" [attr.disabled]="loading ? true : null" />
+                <label for="shuffle-0" class="form-check-label">No</label>
+              </div>
+              <div class="form-check">
+                <input type="radio" class="form-check-input" id="shuffle-1"
+                       formControlName="shuffle" [value]="1" [attr.disabled]="loading ? true : null" />
+                <label for="shuffle-1" class="form-check-label">Yes</label>
+              </div>
+            </div>
+            <div class="col-4">
+              <label class="form-label">Answer Selection</label>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" id="selection-0"
+                       formControlName="selection" [value]="0" [attr.disabled]="loading ? true : null" />
+                <label class="form-check-label" for="selection-0">Radio buttons</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" id="selection-1"
+                       formControlName="selection" [value]="1" [attr.disabled]="loading ? true : null" />
+                <label class="form-check-label" for="selection-1">Checkboxes</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12">
+      <button type="submit" class="btn btn-sm btn-outline-primary" [disabled]="submitting || loading">
+        <ng-container *ngIf="!submitting else Loading">
+          Submit
+        </ng-container>
+        <ng-template #Loading>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Submitting...
+        </ng-template>
+      </button>
+    </div>
+  </div>
+</form>
