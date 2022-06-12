@@ -1,0 +1,16 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Test_Builder.Models;
+
+namespace Test_Builder.Services
+{
+    public interface IQuestionService
+    {
+        public Question? Get(int questionId);
+        public int Insert(Question question);
+        public void Update(Question question);
+        public int? Duplicate(int questionId);
+        public IEnumerable<Test> UsedIn(int questionId);
+        public int Delete(int questionId);
+    }
+}

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.ComponentModel.DataAnnotations;
 using Test_Builder.Services;
 using Test_Builder.Models;
+using Newtonsoft.Json;
 
 namespace Test_Builder.Controllers
 {
@@ -11,18 +11,18 @@ namespace Test_Builder.Controllers
     [Produces("application/json")]
     public class QuestionController : ControllerBase
     {
-        private readonly IDBHelper _DBHelper;
+        private readonly IDBHelper dBHelper;
 
-        public QuestionController(IDBHelper DBHelper)
+        public QuestionController(IDBHelper dBHelper)
         {
-            _DBHelper = DBHelper;
+            this.dBHelper = dBHelper;
         }
 
         // Get: api/question/types
         [HttpGet("types")]
         public IActionResult GetTypes()
         {
-            var questionTypes = _DBHelper.QueryList2<QuestionType>(
+            var questionTypes = dBHelper.QueryList2<QuestionType>(
                 @"SELECT id AS Id, name AS Name, icon AS Icon, link AS Link 
                 FROM question_type"
             );
@@ -50,7 +50,7 @@ namespace Test_Builder.Controllers
                 LEFT JOIN test_question tq ON tq.question_id = q.id AND tq.customer_id = @customer_id #status
                 WHERE q.customer_id = @customer_id #searchTerm";
 
-            var result = _DBHelper.GetDataResult(query, parameters);
+            var result = dBHelper.GetDataResult(query, parameters);
 
             return new JsonResult(result);
         }
@@ -58,40 +58,11 @@ namespace Test_Builder.Controllers
         // Post: api/question/add/1
         [HttpPost("add/{pageId?}")]
         [Authorize]
-        public IActionResult Add([FromBody] Question question, int? pageId)
+        public IActionResult Add([FromServices] IQuestionService questionService, [FromBody] Question question, int? pageId)
         {
             if (ModelState.IsValid)
             {
-                var questionId = (int)_DBHelper.Write(
-                    @"INSERT INTO question(type_id, category_id, points, penalty, shuffle, selection, question, customer_id)
-                    OUTPUT INSERTED.id
-                    VALUES(@type_id, @category_id, @points, @penalty, @shuffle, @selection, @question, @customer_id)",
-                    new Dictionary<string, object> { { "type_id", question.TypeId }, { "category_id", question.CategoryId },
-                        { "points", question.Points},
-                        { "penalty", question.Penalty.HasValue ? question.Penalty : DBNull.Value },
-                        { "shuffle", question.Shuffle.HasValue ? question.Shuffle : DBNull.Value},
-                        { "selection", question.Selection.HasValue ? question.Selection : DBNull.Value},
-                        { "question", question._Question},
-                        { "customer_id", User.Identity.Name} }
-                );
-
-                if(question.Answers != null)
-                {
-                    foreach(var answer in question.Answers)
-                    {
-                        _DBHelper.Write(
-                            @"INSERT INTO answer(answer, match, question_id, points, penalty, correct, customer_id)
-                            VALUES(@answer, @match, @question_id, @points, @penalty, @correct, @customer_id)",
-                            new Dictionary<string, object> { { "answer", answer._Answer }, 
-                                { "match", answer.Match != null ? answer.Match : DBNull.Value },
-                                { "question_id", questionId },
-                                { "points", answer.Points.HasValue ? answer.Points : DBNull.Value},
-                                { "penalty", answer.Penalty.HasValue ? answer.Penalty : DBNull.Value },
-                                { "correct", answer.Correct },
-                                { "customer_id", User.Identity.Name} }
-                        );
-                    }
-                }
+                var questionId = questionService.Insert(question);
 
                 if(pageId.HasValue)
                 {
@@ -99,14 +70,14 @@ namespace Test_Builder.Controllers
 
                     if(TryValidateModel(testQuestion))
                     {
-                        var maxPosition = _DBHelper.Query<int>(
+                        var maxPosition = dBHelper.Query<int>(
                             @"SELECT ISNULL(MAX(position) + 1, 0) AS Nbr
                             FROM test_question
                             WHERE page_id = @page_id AND customer_id = @customer_id",
                             new Dictionary<string, object>() { { "page_id", pageId }, { "customer_id", User.Identity.Name } }
                         );
 
-                        _DBHelper.Write(@"
+                        dBHelper.Write(@"
                             INSERT INTO test_question(page_id, position, random, question_id, 
                                 category_id, subcategory_id, type_id, number, question_ids, customer_id)
                             OUTPUT INSERTED.id
@@ -144,49 +115,11 @@ namespace Test_Builder.Controllers
         // Post: api/question/edit
         [HttpPost("edit")]
         [Authorize]
-        public IActionResult Edit([FromBody] Question question)
+        public IActionResult Edit([FromServices] IQuestionService questionService, [FromBody] Question question)
         {
             if (ModelState.IsValid)
             {
-                _DBHelper.Write(
-                    @"UPDATE question
-                    SET type_id = @type_id, category_id = @category_id, points = @points, penalty = @penalty, 
-                        shuffle = @shuffle, selection = @selection, question = @question
-                    WHERE id = @id AND customer_id = @customer_id",
-                    new Dictionary<string, object> { { "type_id", question.TypeId }, { "category_id", question.CategoryId },
-                        { "points", question.Points},
-                        { "penalty", question.Penalty.HasValue ? question.Penalty : DBNull.Value },
-                        { "shuffle", question.Shuffle.HasValue ? question.Shuffle : DBNull.Value },
-                        { "selection", question.Selection.HasValue ? question.Selection : DBNull.Value },
-                        { "question", question._Question },
-                        { "customer_id", User.Identity.Name }, { "id", question.Id } }
-                );
-
-                // deleting all answers and adding the new ones
-                _DBHelper.Write(
-                    @"DELETE FROM answer 
-                    WHERE question_id = @question_id AND customer_id = @customer_id",
-                    new Dictionary<string, object> { 
-                        { "question_id", question.Id }, { "customer_id", User.Identity.Name } }
-                );
-
-                if (question.Answers != null)
-                {
-                    foreach (var answer in question.Answers)
-                    {
-                        _DBHelper.Write(
-                            @"INSERT INTO answer(answer, match, question_id, points, penalty, correct, customer_id)
-                            VALUES(@answer, @match, @question_id, @points, @penalty, @correct, @customer_id)",
-                            new Dictionary<string, object> { { "answer", answer._Answer },
-                                { "match", answer.Match != null ? answer.Match : DBNull.Value },
-                                { "question_id", question.Id },
-                                { "points", answer.Points.HasValue ? answer.Points : DBNull.Value},
-                                { "penalty", answer.Penalty.HasValue ? answer.Penalty : DBNull.Value },
-                                { "correct", answer.Correct },
-                                { "customer_id", User.Identity.Name} }
-                        );
-                    }
-                }
+                questionService.Update(question);
 
                 return new JsonResult(new { });
             }
@@ -199,34 +132,55 @@ namespace Test_Builder.Controllers
             return new JsonResult(errorsDict) { StatusCode = 422 };
         }
 
+        // Post: api/question/duplicate/1
+        [HttpPost("duplicate/{id}")]
+        [Authorize]
+        public IActionResult Duplicate([FromServices] IQuestionService questionService, int id)
+        {
+            var questionId = questionService.Duplicate(id);
+
+            if (questionId == null)
+                return new JsonResult(new { }) { StatusCode = 404 };
+
+            return new JsonResult(new { questionId });
+        }
+
+        // Delete: api/question/delete/1
+        [HttpDelete("delete/{id}")]
+        [Authorize]
+        public IActionResult Delete([FromServices] IQuestionService questionService, int id)
+        {
+            var result = questionService.Delete(id);
+
+            if (result == 1)
+                return new JsonResult(new { message = "Can't delete this question, it is used in other tests." }) { StatusCode = 409 };
+
+            return new JsonResult(new { });
+        }
+
+        // Get: api/question/used-in/1
+        [HttpGet("used-in/{id}")]
+        [Authorize]
+        public IActionResult UsedIn([FromServices] IQuestionService questionService, int id)
+        {
+            var tests = questionService.UsedIn(id);
+
+            return new JsonResult(tests, new JsonSerializerSettings() { 
+                Converters = { new UsedInTestConverter() }
+            });
+        }
+
         // Get: api/question/1
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        [Authorize]
+        public IActionResult Get([FromServices] IQuestionService questionService, int id)
         {
-            var question = _DBHelper.Query2<Question>(
-                @"SELECT type_id AS TypeId, category_id AS CategoryId, points AS Points, penalty AS Penalty, 
-                    shuffle AS Shuffle, selection AS Selection, question AS _Question
-                FROM question q
-                WHERE id = @id AND customer_id = @customer_id",
-                new Dictionary<string, object> { { "id", id }, { "customer_id", User.Identity.Name } }
-            );
+            var question = questionService.Get(id);
 
             if (question == null)
-            {
                 return new JsonResult(new { }) { StatusCode = 404 };
-            }
-
-            var answers = _DBHelper.QueryList2<Answer>(
-                @"SELECT id AS Id, answer AS _Answer, match AS Match, points AS Points, penalty AS Penalty, correct AS Correct
-                FROM answer a
-                WHERE question_id = @question_id AND customer_id = @customer_id",
-                new Dictionary<string, object> { { "question_id", id }, { "customer_id", User.Identity.Name } }
-            );
-            
-            question.Answers = answers.ToArray();
 
             return new JsonResult(question);
         }
-
     }
 }

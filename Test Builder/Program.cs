@@ -3,7 +3,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Serialization;
-using AutoMapper;
 
 using Test_Builder.Services;
 using Test_Builder.Profiles;
@@ -25,7 +24,10 @@ builder.Services.AddControllers(options =>
 // Add services to the container.
 builder.Services.AddSingleton<IDBHelper, DBHelper>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSingleton<IQuestionService, QuestionService>();
+builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+
+
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;

@@ -1,11 +1,13 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { OnDestroy } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { Category } from '../category/category.model';
 import { CategoryService } from '../category/category.service';
+import { ConfirmationModalComponent } from '../confirmation-modal/confirmation-modal.component';
 import { DataResult, QuestionType } from '../question-add/question.model';
 import { QuestionService } from '../question-add/question.service';
 import { Page, TestQuestion } from '../test/test.model';
@@ -152,9 +154,10 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
     else {
       this._subCategories = this.categories.filter(c => c.ParentId === selectedCategory);
     }
-    if (this._subCategories.length > 0) {
-      this.filterForm.patchValue({ subCategory: this._subCategories[0].Id });
-    }
+    this.filterForm.patchValue({ subCategory: 0 });
+    //if (this._subCategories.length > 0) {
+    //  this.filterForm.patchValue({ subCategory: this._subCategories[0].Id });
+    //}
   }
 
   LoadData(): void {
@@ -216,25 +219,8 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
     });
   }
 
-  getEditRoute(question: TestQuestion): Array<string | number> {
-    switch (question.TypeId) {
-      case 1:
-        return ['/add-question', 0, 'multiple-choice', question.QuestionId!];
-      case 2:
-        return ['/add-question', 0, 'true-false', question.QuestionId!];
-      case 3:
-        return ['/add-question', 0, 'matching', question.QuestionId!];
-      case 4:
-        return ['/add-question', 0, 'free-text', question.QuestionId!];
-      case 5:
-        return ['/add-question', 0, 'essay', question.QuestionId!];
-    }
-    return [];
-  }
-
-  // delete question from page if already attached
-  OnDeleteQuestion(question: TestQuestion): void {
-
+  ReloadData(): void {
+    this.LoadData();
   }
 
   OnFilterSubmit(): void {

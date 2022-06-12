@@ -1,6 +1,5 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectorRef } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -28,7 +27,6 @@ export class PageEditComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private modal: NgbModal,
-    //private changeDetector: ChangeDetectorRef
   ) { }
 
   get positions(): FormArray {

@@ -10,7 +10,6 @@ import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
-import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { QuestionAddComponent } from './question-add/question-add.component';
 import { SplitPipe } from './pipes/split.pipe';
 import { MultipleChoiceAddComponent } from './question-add/multiple-choice/multiple-choice.component';
@@ -19,7 +18,7 @@ import { MatchingAddComponent } from './question-add/matching-add/matching-add.c
 import { FreeTextAddComponent } from './question-add/free-text-add/free-text-add.component';
 import { EssayAddComponent } from './question-add/essay-add/essay-add.component';
 import { LoginComponent } from './login/login.component';
-import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { RegisterComponent } from './register/register.component';
 import { CategoryComponent } from './category/category.component';
 import { CategoryManageComponent } from './category/category-manage/category-manage.component';
@@ -34,6 +33,7 @@ import { TestEditComponent } from './test/test-edit/test-edit.component';
 import { PageSettingsComponent } from './test/page-settings/page-settings.component';
 import { PageEditComponent } from './test/page-edit/page-edit.component';
 import { QuestionBankComponent } from './question-bank/question-bank.component';
+import { QuestionItemComponent } from './question-bank/question-item/question-item.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +41,6 @@ import { QuestionBankComponent } from './question-bank/question-bank.component';
     NavMenuComponent,
     HomeComponent,
     CounterComponent,
-    FetchDataComponent,
     QuestionAddComponent,
     SplitPipe,
     ObjectLengthPipe,
@@ -62,7 +61,8 @@ import { QuestionBankComponent } from './question-bank/question-bank.component';
     TestEditComponent,
     PageSettingsComponent,
     PageEditComponent,
-    QuestionBankComponent
+    QuestionBankComponent,
+    QuestionItemComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -72,7 +72,6 @@ import { QuestionBankComponent } from './question-bank/question-bank.component';
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
-      { path: 'fetch-data', component: FetchDataComponent },
       {
         path: 'add-question/:page-id', component: QuestionAddComponent,
         children: [
@@ -98,6 +97,7 @@ import { QuestionBankComponent } from './question-bank/question-bank.component';
     ]),
     AngularEditorModule,
     NgbModalModule,
+    NgbPopoverModule,
     DragDropModule,
   ],
   providers: [
