@@ -222,7 +222,7 @@ namespace Test_Builder.Services
                             }
                             break;
                         case "term":
-                            sqlParameters.Add("term", item.Value);
+                            sqlParameters.Add("term", "%" + item.Value + "%");
                             sql = sql.Replace("#searchTerm", "AND q.question LIKE @term");
                             break;
                         default:

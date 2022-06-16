@@ -100,25 +100,45 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
           this.filter = this.decodeParam(queryParams['_filter']);
         }
 
-        if (!this.filter.hasOwnProperty('status')) {
+        if (!this.filter.hasOwnProperty('status') || !['0', '1', '2'].includes(this.filter['status'])) {
           this.filter['status'] = '0';
         }
 
-        if (!this.filter.hasOwnProperty('type')) {
+        if (!this.filter.hasOwnProperty('type') || isNaN(+this.filter['type'])) {
           this.filter['type'] = '0';
         }
 
-        if (!this.filter.hasOwnProperty('category')) {
+        if (!this.filter.hasOwnProperty('category') || isNaN(+this.filter['category'])) {
           this.filter['category'] = '0';
         }
 
-        if (!this.filter.hasOwnProperty('subCategory')) {
+        if (!this.filter.hasOwnProperty('subCategory') || isNaN(+this.filter['subCategory'])) {
           this.filter['subCategory'] = '0';
         }
 
         if (!this.filter.hasOwnProperty('term')) {
           this.filter['term'] = '';
         }
+
+        //filterForm: FormGroup = new FormGroup({
+        //  status: new FormControl(0),
+        //  questionType: new FormControl(0),
+        //  category: new FormControl(0),
+        //  subCategory: new FormControl(0),
+        //  searchTerm: new FormControl(''),
+        //});
+        this.filterForm.patchValue({
+          status: +this.filter['status'],
+          questionType: +this.filter['type'],
+          category: +this.filter['category'],
+          //subCategory: +this.filter['subCategory'], // because OnCategoryChange gets triggered
+          searchTerm: this.filter['term'],
+        });
+
+        //this.filterForm.patchValue({
+        //  subCategory: +this.filter['subCategory'],
+        //});
+
 
         console.log('this.filter', this.filter);        
         this.LoadData();
@@ -154,7 +174,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
     else {
       this._subCategories = this.categories.filter(c => c.ParentId === selectedCategory);
     }
-    this.filterForm.patchValue({ subCategory: 0 });
+    this.filterForm.patchValue({ subCategory: +this.filter['subCategory'] });
     //if (this._subCategories.length > 0) {
     //  this.filterForm.patchValue({ subCategory: this._subCategories[0].Id });
     //}
