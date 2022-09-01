@@ -14,20 +14,21 @@ import { Question } from '../question.model';
 @Component({
   selector: 'app-multiple-choice-add',
   templateUrl: './multiple-choice.component.html',
-  styleUrls: ['./multiple-choice.component.css']
+  styleUrls: ['./multiple-choice.component.scss']
 })
 export class MultipleChoiceAddComponent implements OnInit, OnDestroy {
 
-  _editorConfig: AngularEditorConfig = editorConfig;
   categories: Category[] = [];
   _categories: Category[] = [];
   _subCategories: Category[] = [];
+  _question: Question | undefined;
+
+  _editorConfig: AngularEditorConfig = editorConfig;
   categoriesSub: Subscription | undefined;
   serverErrors: { [key: string]: string } = {};
   submitting: boolean = false;
   pageId: number = 0;
   questionId: number = 0;
-  _question: Question | undefined;
   loading: boolean = false;
 
   multipleChoice: FormGroup = new FormGroup({

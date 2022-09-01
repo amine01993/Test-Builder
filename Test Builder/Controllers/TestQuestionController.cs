@@ -34,7 +34,7 @@ namespace Test_Builder.Controllers
                     SET position = @position
                     WHERE id = @id AND customer_id = @customer_id",
                     new Dictionary<string, object> { { "position", position._Position },
-                        { "id", position.Id },{ "customer_id", User.Identity.Name }}
+                        { "id", position.Id }, { "customer_id", User.Identity.Name }}
                 );
             }
 

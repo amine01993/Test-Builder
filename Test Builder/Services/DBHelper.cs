@@ -172,7 +172,7 @@ namespace Test_Builder.Services
             var sqlParameters = new Dictionary<string, object>() 
             { { "customer_id", _httpContextAccessor.HttpContext.User.Identity.Name } };
             
-            IDictionary<string, string> filter = parameters.decodeParam(parameters._filter);
+            IDictionary<string, string> filter = parameters.decodeFilter();
             //IDictionary<string, string> orderBy = parameters.decodeParam(parameters._orderBy);
 
             foreach (var item in filter)

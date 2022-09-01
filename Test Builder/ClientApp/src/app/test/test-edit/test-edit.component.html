@@ -1,6 +1,27 @@
 
 <div class="row g-3">
   <div class="col-6">
+    <button type="button" class="btn btn-sm btn-secondary me-2">
+      <i class="bi bi-files"></i> Duplicate
+    </button>
+    <button type="button" class="btn btn-sm btn-danger">
+      <i class="bi bi-trash"></i> Delete
+    </button>
+  </div>
+  <div class="col-6 text-end pe-0">
+    <button type="button" class="btn btn-sm btn-outline-warning me-2">
+      <i class="bi bi-play-fill"></i> Preview Test
+    </button>
+    <button type="button" class="btn btn-sm btn-warning">
+      <i class="bi bi-reply-fill assign-icon"></i> Assign Test
+    </button>
+  </div>
+
+  <div class="col-12">
+    Test Introduction
+  </div>
+
+  <div class="col-6">
     <h3>
       {{ test?.Name }}
     </h3>
@@ -11,17 +32,16 @@
   <!--<div class="col-12">
     Questions: 3 Fixed + 2 Auto selected at random on start
   </div>-->
-
   <!-- pages list + actions -->
   <div class="col-12">
     <div class="row page-drop-boundary" cdkDropList (cdkDropListDropped)="drop($event)">
       <div *ngFor="let page of pages; let i = index;" class="col-12"
            cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".page-drop-boundary">
         <div class="row align-items-end shadow-sm p-2">
-            <!-- drag + drop -->
-            <!-- page name -->
-            <!-- page properties (limit + shuffle) -->
-            <!-- page actions (edit + config + delete) -->
+          <!-- drag + drop -->
+          <!-- page name -->
+          <!-- page properties (limit + shuffle) -->
+          <!-- page actions (edit + config + delete) -->
           <div class="col-1 ps-0">
             <i class="bi bi-arrow-down-up" style="cursor: move;" cdkDragHandle></i>
           </div>
@@ -40,15 +60,15 @@
           </div>
           <div class="col-4 pe-0 text-end">
             <!--<button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="add-question-menu" data-bs-toggle="dropdown" aria-expanded="false">
-        Add Question
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="add-question-menu">
-        <li><button class="dropdown-item" type="button">Add a new question</button></li>
-        <li><button class="dropdown-item" type="button">Reuse from your question bank</button></li>
-        <li><button class="dropdown-item" type="button">Add random questions</button></li>
-      </ul>
-      &nbsp;-->
-            <a class="btn btn-sm btn-success me-1" role="button" [routerLink]="['/page-edit', page.Id]">
+              Add Question
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="add-question-menu">
+              <li><button class="dropdown-item" type="button">Add a new question</button></li>
+              <li><button class="dropdown-item" type="button">Reuse from your question bank</button></li>
+              <li><button class="dropdown-item" type="button">Add random questions</button></li>
+            </ul>
+            &nbsp;-->
+            <a class="btn btn-sm btn-success me-1" role="button" [routerLink]="['/admin', 'page-edit', page.Id]">
               <i class="bi bi-pencil-fill"></i>
             </a>
             <button class="btn btn-sm btn-light me-1" (click)="OnEditPageSettings(page)">

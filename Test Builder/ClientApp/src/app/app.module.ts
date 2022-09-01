@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { ApplicationRef, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
@@ -9,7 +9,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
-import { CounterComponent } from './counter/counter.component';
 import { QuestionAddComponent } from './question-add/question-add.component';
 import { SplitPipe } from './pipes/split.pipe';
 import { MultipleChoiceAddComponent } from './question-add/multiple-choice/multiple-choice.component';
@@ -34,13 +33,16 @@ import { PageSettingsComponent } from './test/page-settings/page-settings.compon
 import { PageEditComponent } from './test/page-edit/page-edit.component';
 import { QuestionBankComponent } from './question-bank/question-bank.component';
 import { QuestionItemComponent } from './question-bank/question-item/question-item.component';
+import { SettingCreateComponent } from './setting-create/setting-create.component';
+import { PreviewComponent } from './preview/preview.component';
+import { AdminComponent } from './admin/admin.component';
+import { PreviewItemComponent } from './preview/preview-item/preview-item.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    CounterComponent,
     QuestionAddComponent,
     SplitPipe,
     ObjectLengthPipe,
@@ -62,7 +64,11 @@ import { QuestionItemComponent } from './question-bank/question-item/question-it
     PageSettingsComponent,
     PageEditComponent,
     QuestionBankComponent,
-    QuestionItemComponent
+    QuestionItemComponent,
+    SettingCreateComponent,
+    PreviewComponent,
+    AdminComponent,
+    PreviewItemComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -70,10 +76,11 @@ import { QuestionItemComponent } from './question-bank/question-item/question-it
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forRoot([
-      { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'counter', component: CounterComponent },
+      { path: '', pathMatch: 'full', redirectTo: 'admin' },
+      { path: 'admin', component: HomeComponent, pathMatch: 'full' },
+      //{ path: 'counter', component: CounterComponent },
       {
-        path: 'add-question/:page-id', component: QuestionAddComponent,
+        path: 'admin/add-question/:page-id', component: QuestionAddComponent,
         children: [
           { path: '', pathMatch: 'full', redirectTo: 'multiple-choice' },
           { path: 'multiple-choice/:id', component: MultipleChoiceAddComponent },
@@ -88,12 +95,15 @@ import { QuestionItemComponent } from './question-bank/question-item/question-it
           { path: 'essay', component: EssayAddComponent }
         ]
       },
-      { path: 'category', component: CategoryComponent },
-      { path: 'test-add', component: TestAddComponent },
-      { path: 'test-edit/:id', component: TestEditComponent },
-      { path: 'page-edit/:page-id', component: PageEditComponent },
-      { path: 'question-bank/:page-id', component: QuestionBankComponent },
-      { path: 'question-bank', component: QuestionBankComponent },
+      { path: 'admin/category', component: CategoryComponent },
+      { path: 'admin/test-add', component: TestAddComponent },
+      { path: 'admin/test-edit/:id', component: TestEditComponent },
+      { path: 'admin/page-edit/:page-id', component: PageEditComponent },
+      { path: 'admin/question-bank/:page-id', component: QuestionBankComponent },
+      { path: 'admin/question-bank', component: QuestionBankComponent },
+      { path: 'admin/setting-create', component: SettingCreateComponent },
+
+      { path: 'preview/test/:id', component: PreviewComponent }
     ]),
     AngularEditorModule,
     NgbModalModule,
@@ -112,7 +122,13 @@ import { QuestionItemComponent } from './question-bank/question-item/question-it
   entryComponents: [
     LoginComponent,
     RegisterComponent,
-    PageSettingsComponent
+    PageSettingsComponent,
+    //AppComponent,
   ]
 })
-export class AppModule { }
+export class AppModule {
+  //ngDoBootstrap(app: ApplicationRef) {
+  //  console.log('bgDoBootstrap');
+  //  app.bootstrap(AppComponent);
+  //}
+}

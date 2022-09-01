@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { AuthenticationData } from '../authentication.model';
 import { AuthenticationService } from '../authentication.service';
 import { LoginComponent } from '../login/login.component';
@@ -9,12 +10,13 @@ import { RegisterComponent } from '../register/register.component';
 @Component({
   selector: 'app-nav-menu',
   templateUrl: './nav-menu.component.html',
-  styleUrls: ['./nav-menu.component.css']
+  styleUrls: ['./nav-menu.component.scss']
 })
-export class NavMenuComponent implements OnInit {
+export class NavMenuComponent implements OnInit, OnDestroy {
   isExpanded = false;
 
   data: AuthenticationData = { name: '', loggedIn: false };
+  authSub: Subscription | undefined;
 
   constructor(
     private route: ActivatedRoute,
@@ -34,7 +36,7 @@ export class NavMenuComponent implements OnInit {
       }
     });
 
-    this.authService.subject.subscribe({
+    this.authSub = this.authService.subject.subscribe({
       next: (obj) => {
         this.data = obj;
       }
@@ -66,5 +68,10 @@ export class NavMenuComponent implements OnInit {
     this.data.loggedIn = false;
     this.authService.removeToken();
     this.router.navigate(['/']);
+  }
+
+  ngOnDestroy(): void {
+    if (this.authSub)
+      this.authSub.unsubscribe();
   }
 }

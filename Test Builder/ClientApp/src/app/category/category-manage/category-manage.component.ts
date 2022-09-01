@@ -8,7 +8,7 @@ import { Category } from '../category.model';
 @Component({
   selector: 'app-category-manage',
   templateUrl: './category-manage.component.html',
-  styleUrls: ['./category-manage.component.css']
+  styleUrls: ['./category-manage.component.scss']
 })
 export class CategoryManageComponent implements OnInit, OnDestroy {
 

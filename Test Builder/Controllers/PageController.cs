@@ -18,11 +18,11 @@ namespace Test_Builder.Controllers
         }
 
         // Get: api/page/get/5
-        [HttpGet("get/{id}")]
+        [HttpGet("{id}")]
         [Authorize]
         public IActionResult Get(int id)
         {
-            long t = DateTime.Now.Ticks, delta;
+            //long t = DateTime.Now.Ticks, delta;
 
             var page = _DBHelper.Query2<Page>(
                @"SELECT id AS Id, name AS Name, limit AS Limit, position AS Position, 
@@ -32,9 +32,9 @@ namespace Test_Builder.Controllers
                 ORDER BY position",
                new Dictionary<string, object> { { "page_id", id }, { "customer_id", User.Identity.Name } }
             );
-            delta = (DateTime.Now.Ticks - t) / TimeSpan.TicksPerMillisecond;
+            //delta = (DateTime.Now.Ticks - t) / TimeSpan.TicksPerMillisecond;
 
-            t = DateTime.Now.Ticks;
+            //t = DateTime.Now.Ticks;
             var questions = _DBHelper.QueryList2<TestQuestion>(
                 @"SELECT tq.id AS Id, tq.position AS Position, tq.random AS Random, tq.question_id AS QuestionId,
                     tq.question_ids AS QuestionIds, tq.number AS Number,
@@ -47,13 +47,13 @@ namespace Test_Builder.Controllers
                 ORDER BY tq.question_id",
                 new Dictionary<string, object> { { "page_id", id }, { "customer_id", User.Identity.Name } }
             );
-            delta = (DateTime.Now.Ticks - t) / TimeSpan.TicksPerMillisecond;
+            //delta = (DateTime.Now.Ticks - t) / TimeSpan.TicksPerMillisecond;
 
             var paramDict = new Dictionary<string, object> { { "customer_id", User.Identity.Name } };
             var inList = new List<string>() { "0" };
             var index = 0;
 
-            t = DateTime.Now.Ticks;
+            //t = DateTime.Now.Ticks;
             foreach (var question in questions)
             {
                 if (question.QuestionId.HasValue)
@@ -62,9 +62,9 @@ namespace Test_Builder.Controllers
                     inList.Add("@question_" + index++);
                 }
             }
-            delta = (DateTime.Now.Ticks - t) / TimeSpan.TicksPerMillisecond;
+            //delta = (DateTime.Now.Ticks - t) / TimeSpan.TicksPerMillisecond;
 
-            t = DateTime.Now.Ticks;
+            //t = DateTime.Now.Ticks;
             var answers = _DBHelper.QueryList2<Answer>(
                 $@"SELECT a.id AS Id, a.answer AS _Answer, a.correct AS Correct, a.match AS Match,
                     a.points AS Points, a.penalty AS Penalty, a.question_id AS QuestionId
@@ -72,7 +72,7 @@ namespace Test_Builder.Controllers
                 WHERE a.question_id IN ({string.Join(',', inList)}) AND a.customer_id = @customer_id
                 ORDER BY a.question_id", paramDict
             );
-            delta = (DateTime.Now.Ticks - t) / TimeSpan.TicksPerMillisecond;
+            //delta = (DateTime.Now.Ticks - t) / TimeSpan.TicksPerMillisecond;
 
             t = DateTime.Now.Ticks;
             index = 0;
@@ -85,14 +85,14 @@ namespace Test_Builder.Controllers
                     question.Answers.Add(answers[index++]);
                 }
             }
-            delta = (DateTime.Now.Ticks - t) / TimeSpan.TicksPerMillisecond;
+            //delta = (DateTime.Now.Ticks - t) / TimeSpan.TicksPerMillisecond;
 
-            t = DateTime.Now.Ticks;
+            //t = DateTime.Now.Ticks;
             questions.Sort((t1, t2) =>
             {
                 return t1.Position < t2.Position ? -1 : 1;
             });
-            delta = (DateTime.Now.Ticks - t) / TimeSpan.TicksPerMillisecond;
+            //delta = (DateTime.Now.Ticks - t) / TimeSpan.TicksPerMillisecond;
 
             return new JsonResult(new { page, questions });
         }
@@ -165,7 +165,7 @@ namespace Test_Builder.Controllers
         [Authorize]
         public IActionResult Delete(int id, [FromQuery] int testId)
         {
-            //Delete page related entities
+            //Delete page questions
             _DBHelper.Write(
                 @"DELETE FROM test_question 
                 WHERE page_id = @page_id AND customer_id = @customer_id",

@@ -14,20 +14,21 @@ import { Question } from '../question.model';
 @Component({
   selector: 'app-true-false-add',
   templateUrl: './true-false.component.html',
-  styleUrls: ['./true-false.component.css']
+  styleUrls: ['./true-false.component.scss']
 })
 export class TrueFalseAddComponent implements OnInit, OnDestroy {
 
-  _editorConfig: AngularEditorConfig = editorConfig;
   categories: Category[] = [];
   _categories: Category[] = [];
   _subCategories: Category[] = [];
+  _question: Question | undefined;
+
+  _editorConfig: AngularEditorConfig = editorConfig;
   categoriesSub: Subscription | undefined;
   serverErrors: { [key: string]: string } = {};
   submitting: boolean = false;
   pageId: number = 0;
   questionId: number = 0;
-  _question: Question | undefined;
   loading: boolean = false;
 
   trueFalse: FormGroup = new FormGroup({

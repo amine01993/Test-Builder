@@ -1,0 +1,479 @@
+
+
+<form [formGroup]="settingsForm" (ngSubmit)="OnSubmit()">
+  <!-- Availability -->
+  <div class="card">
+    <div class="card-header">
+      <div class="row">
+        <div class="col-3">
+          Availability
+        </div>
+        <div class="col-9">
+          Available
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="availability"
+                   formControlName="availability" (change)="OnAvailabilityChange()">
+            <label class="form-check-label" for="availability">Available</label>
+          </div>
+        </div>
+
+        <div *ngIf="availability.value" class="col-12">
+          <div class="row g-2">
+            <ng-container formGroupName="availableFrom">
+              <div class="col-3">
+                <label for="availabilityDateFrom" class="form-label">Available From:</label>
+              </div>
+              <div class="col-3">
+                <input class="form-control form-control-sm" id="availabilityDateFrom" placeholder="mm/dd/yyyy"
+                       formControlName="date">
+              </div>
+              <div class="col-2">
+                <select class="form-select form-select-sm" formControlName="hour">
+                  <option *ngFor="let option of hourOptions;" [value]="option.key">{{ option.val }}</option>
+                </select>
+              </div>
+              <div class="col-2">
+                <select class="form-select form-select-sm" formControlName="minute">
+                  <option *ngFor="let option of minuteOptions;" [value]="option.key">{{ option.val }}</option>
+                </select>
+              </div>
+              <div class="col-2">
+                <select class="form-select form-select-sm" formControlName="a">
+                  <option value="am" selected>am</option>
+                  <option value="pm">pm</option>
+                </select>
+              </div>
+            </ng-container>
+
+            <ng-container formGroupName="availableUntil">
+              <div class="col-3">
+                <label for="availabilityDateUntil" class="form-label">Available Until:</label>
+              </div>
+              <div class="col-3">
+                <input class="form-control form-control-sm" id="availabilityDateUntil" placeholder="mm/dd/yyyy"
+                       formControlName="date">
+              </div>
+              <div class="col-2">
+                <select class="form-select form-select-sm" formControlName="hour">
+                  <option *ngFor="let option of hourOptions" [value]="option.key">{{ option.val }}</option>
+                </select>
+              </div>
+              <div class="col-2">
+                <select class="form-select form-select-sm" formControlName="minute">
+                  <option *ngFor="let option of minuteOptions" [value]="option.key">{{ option.val }}</option>
+                </select>
+              </div>
+              <div class="col-2">
+                <select class="form-select form-select-sm" formControlName="a">
+                  <option value="am" selected>am</option>
+                  <option value="pm">pm</option>
+                </select>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Attempts and Restrictions -->
+  <div class="card mt-3">
+    <div class="card-header">
+      <div class="row g-2">
+        <div class="col-3">
+          Attempts
+        </div>
+        <div class="col-9">
+          Unlimited Attempts Allowed
+        </div>
+        <div class="col-3">
+          Restrictions
+        </div>
+        <div class="col-9">
+          No Password
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+
+        <div class="col-3">
+          <label for="attempts" class="form-label">Attempts:</label>
+        </div>
+        <div class="col-5">
+          <input class="form-control form-control-sm" id="attempts" placeholder="0 = unlimited"
+                 formControlName="attempts">
+        </div>
+        <div class="col-4"></div>
+
+        <div class="col-3">
+          <label for="attempts" class="form-label">Password:</label>
+        </div>
+        <div class="col-5">
+          <input class="form-control form-control-sm" id="password"
+                 formControlName="password">
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- User Info -->
+  <div class="card mt-3">
+    <div class="card-header">
+      <div class="row g-2">
+        <div class="col-3">
+          User Info
+        </div>
+        <div class="col-9">
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+
+        <div class="col-3">
+          <label class="form-label">Require:</label>
+        </div>
+        <div class="col-5">
+          <div class="form-check">
+            <input type="checkbox" id="user-info-firstname"
+                   class="form-check-input" formControlName="userInfoFirstname" />
+            <label class="form-check-label" for="user-info-firstname">
+              First name
+            </label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="user-info-lastname"
+                   class="form-check-input" formControlName="userInfoLastname" />
+            <label class="form-check-label" for="user-info-lastname">
+              Last name
+            </label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="user-info-email"
+                   class="form-check-input" formControlName="userInfoEmail" />
+            <label class="form-check-label" for="user-info-email">
+              Email address
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intro Questions -->
+  <div class="card mt-3">
+    <div class="card-header">
+      <div class="row g-2">
+        <div class="col-3">
+          Intro Questions
+        </div>
+        <div class="col-9">
+        </div>
+      </div>
+    </div>
+    <div class="card-body" formArrayName="extraQuestions">
+      <div class="row g-3">
+
+        <ng-container *ngFor="let extraQuestion of extraQuestions.controls; let i = index;" formGroupName="{{ i }}">
+          <div *ngIf="i > 0" class="extra-question-separator"></div>
+          <div class="col-8">
+            <div class="form-check">
+              <input type="checkbox" id="mandatory-{{ i }}"
+                     class="form-check-input" formControlName="mandatory" />
+              <label class="form-check-label" for="mandatory-{{ i }}">
+                Make this extra question mandatory
+              </label>
+            </div>
+          </div>
+          <div class="col-4 text-end">
+            <button *ngIf="i > 0" (click)="OnDeleteExtraQuestion(i)" class="btn btn-sm btn-danger">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Extra Question</label>
+            <angular-editor formControlName="question" [config]="_editorConfig"></angular-editor>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">
+              Select Answer Option
+            </label>
+            <div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="text-box-{{ i }}"
+                       [value]="0" formControlName="answerOption">
+                <label class="form-check-label" for="text-box-{{ i }}">Text box</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="input-box-{{ i }}"
+                       [value]="1" formControlName="answerOption">
+                <label class="form-check-label" for="input-box-{{ i }}">Input box</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="drop-down-{{ i }}"
+                       [value]="2" formControlName="answerOption">
+                <label class="form-check-label" for="drop-down-{{ i }}">Drop down</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="checkboxes-{{ i }}"
+                       [value]="3" formControlName="answerOption">
+                <label class="form-check-label" for="checkboxes-{{ i }}">Checkboxes</label>
+              </div>
+            </div>
+            <div>
+              <ng-container *ngIf="extraQuestion.value.answerOption === 0">
+                <div>
+                  Answers will be typed in a multi-line text box like this.
+                </div>
+                <textarea disabled></textarea>
+              </ng-container>
+
+              <ng-container *ngIf="extraQuestion.value.answerOption === 1">
+                <div>
+                  Answers will be typed in an input box like this.
+                </div>
+                <input type="text" disabled />
+              </ng-container>
+
+              <ng-container *ngIf="extraQuestion.value.answerOption === 2" formGroupName="dropDownOption">
+                <ng-container *ngIf="extraQuestion.value.dropDownOption.preview" formArrayName="answers">
+                  <select class="form-select form-select-sm">
+                    <option selected>Please select an option</option>
+                    <option *ngFor="let answer of getAnswersFormArray(extraQuestion).controls" [value]="answer.value">
+                      {{ answer.value }}
+                    </option>
+                  </select>
+
+                  <div>
+                    <button class="btn btn-sm btn-outline-success" type="button"
+                            (click)="OnExtraQuestionEdit(extraQuestion)">
+                      Edit
+                    </button>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="!extraQuestion.value.dropDownOption.preview">
+                  <div>
+                    Single Answer will be selected from Drop Down list.
+                  </div>
+                  <textarea formControlName="answersText"></textarea>
+                  <div>
+                    <button class="btn btn-sm btn-outline-warning" type="button"
+                            (click)="OnExtraQuestionPreview(extraQuestion)">
+                      Preview
+                    </button>
+                  </div>
+                </ng-container>
+              </ng-container>
+
+
+              <ng-container *ngIf="extraQuestion.value.answerOption === 3" formGroupName="checkBoxesOption">
+                <ng-container *ngIf="extraQuestion.value.checkBoxesOption.preview" formArrayName="answers">
+                  <div *ngFor="let answer of getAnswersFormArray(extraQuestion).controls; let j = index" class="form-check">
+                    <input type="checkbox" [value]="answer.value"
+                           class="form-check-input" id="{{ 'check-input' + i + '-' + j}}" />
+                    <label class="form-check-label" for="{{ 'check-input' + i + '-' + j}}">{{ answer.value }}</label>
+                  </div>
+
+                  <div>
+                    <button class="btn btn-sm btn-outline-success" type="button"
+                            (click)="OnExtraQuestionEdit(extraQuestion)">
+                      Edit
+                    </button>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="!extraQuestion.value.checkBoxesOption.preview">
+                  <div>
+                    Multiple Answers can be selected from Checkbox items.
+                  </div>
+                  <textarea formControlName="answersText"></textarea>
+                  <div>
+                    <button class="btn btn-sm btn-outline-warning" type="button"
+                            (click)="OnExtraQuestionPreview(extraQuestion)">
+                      Preview
+                    </button>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </div>
+
+          </div>
+        </ng-container>
+
+        <div class="col-12 text-center">
+          <button class="btn btn-sm btn-primary" (click)="OnAddExtraQuestion()">
+            <i class="bi bi-plus"></i> Add another Extra Question
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Resume Later -->
+  <div class="card mt-3">
+    <div class="card-header">
+      <div class="row g-2">
+        <div class="col-3">
+          Resume Later
+        </div>
+        <div class="col-9">
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="form-check">
+            <input type="checkbox" id="resume-later"
+                   class="form-check-input" formControlName="resumeLater" />
+            <label class="form-check-label" for="resume-later">
+              Allow save and resume later
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Display -->
+  <div class="card mt-3">
+    <div class="card-header">
+      <div class="row g-2">
+        <div class="col-3">
+          Display
+        </div>
+        <div class="col-9">
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="form-check">
+            <input type="checkbox" id="display-points"
+                   class="form-check-input" formControlName="displayPoints" />
+            <label class="form-check-label" for="display-points">
+              Display Points each Question is worth during Test
+            </label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-check">
+            <input type="checkbox" id="display-category"
+                   class="form-check-input" formControlName="displayCategory" />
+            <label class="form-check-label" for="display-category">
+              Display Category for each Question
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Passmark & Feedback -->
+  <div class="card mt-3">
+    <div class="card-header">
+      <div class="row g-2">
+        <div class="col-3">
+          Pass Mark
+        </div>
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+          Display
+        </div>
+        <div class="col-9">
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-3">
+          <label for="pass-mark" class="form-label">Pass Mark:</label>
+        </div>
+        <div class="col-5">
+          <input class="form-control form-control-sm" id="pass-mark"
+                 formControlName="passMark">
+        </div>
+        <div class="col-4">%</div>
+
+        <div class="col-12">
+          <label class="form-label" *ngIf="passMark.valid">Test completed message: Show on pass</label>
+          <label class="form-label" *ngIf="!passMark.valid">Test completed message</label>
+          <angular-editor formControlName="showOnPass" [config]="_editorConfig"></angular-editor>
+        </div>
+
+        <div class="col-12" *ngIf="passMark.valid">
+          <label class="form-label">Test completed message: Show on fail</label>
+          <angular-editor formControlName="showOnFail" [config]="_editorConfig"></angular-editor>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Printing & Copy, Paste -->
+  <div class="card mt-3">
+    <div class="card-header">
+      <div class="row g-2">
+        <div class="col-3">
+          Printing
+        </div>
+        <div class="col-9">
+          No
+        </div>
+        <div class="col-3">
+          Copy, Paste
+        </div>
+        <div class="col-9">
+          No, No
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="allow-printing"
+                   formControlName="allowPrinting" />
+            <label for="allow-printing">Allow Printing</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="allow-highlight-and-copy"
+                   formControlName="allowHighlightAndCopy" />
+            <label for="allow-highlight-and-copy">Allow Highlight & Copy Text</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="allow-pasting"
+                   formControlName="allowPasting" />
+            <label for="allow-pasting">Allow Pasting Text</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row my-3">
+    <div class="col-12">
+      <button type="submit" class="btn btn-sm btn-outline-primary">
+        Submit
+      </button>
+    </div>
+  </div>
+</form>

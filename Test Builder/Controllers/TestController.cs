@@ -72,7 +72,7 @@ namespace Test_Builder.Controllers
                     );
                 }
 
-                return new JsonResult(new { result = 1, id = test.Id });
+                return new JsonResult(new { id = test.Id });
             }
 
             var errors = ModelState.Where(x => x.Value.Errors.Count > 0).ToDictionary(

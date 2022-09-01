@@ -6,7 +6,7 @@ import { QuestionService } from './question.service';
 @Component({
   selector: 'app-question-add',
   templateUrl: './question-add.component.html',
-  styleUrls: ['./question-add.component.css']
+  styleUrls: ['./question-add.component.scss']
 })
 export class QuestionAddComponent implements OnInit, OnDestroy {
 

@@ -9,7 +9,7 @@ import { CategoryService } from '../category.service';
 @Component({
   selector: 'app-subcategory-manage',
   templateUrl: './subcategory-manage.component.html',
-  styleUrls: ['./subcategory-manage.component.css']
+  styleUrls: ['./subcategory-manage.component.scss']
 })
 export class SubcategoryManageComponent implements OnInit, OnDestroy {
 

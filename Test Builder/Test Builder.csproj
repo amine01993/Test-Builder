@@ -44,6 +44,7 @@
     <None Remove="ClientApp\src\app\question-add\question.service.ts" />
     <None Remove="ClientApp\src\app\question-add\question.validator.ts" />
     <None Remove="ClientApp\src\app\register\register.validator.ts" />
+    <None Remove="ClientApp\src\app\setting-create\setting.validator.ts" />
     <None Remove="ClientApp\src\app\test\page-settings\page-settings.validator.ts" />
   </ItemGroup>
 
@@ -65,6 +66,9 @@
     <TypeScriptCompile Include="ClientApp\src\app\question-add\question.service.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\question-add\question.validator.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\register\register.validator.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\setting-create\setting.validator.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\app\test\page-settings\page-settings.validator.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>

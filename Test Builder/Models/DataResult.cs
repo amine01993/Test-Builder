@@ -14,13 +14,13 @@
         public string? _filter { get; set; }
         public string? _orderBy { get; set; }
 
-        public IDictionary<string, string> decodeParam(string str)
+        public IDictionary<string, string> decodeFilter()
         {
             var dict = new Dictionary<string, string>();
-            if (string.IsNullOrEmpty(str))
+            if (string.IsNullOrEmpty(_filter))
                 return dict;
 
-            var tokens = str.Split(';');
+            var tokens = _filter.Split(';');
             foreach (var token in tokens)
             {
                 var t = token.Split('=');

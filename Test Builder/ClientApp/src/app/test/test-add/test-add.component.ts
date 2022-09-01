@@ -11,7 +11,7 @@ import { editorConfig } from '../../editor.config';
 @Component({
   selector: 'app-test-add',
   templateUrl: './test-add.component.html',
-  styleUrls: ['./test-add.component.css']
+  styleUrls: ['./test-add.component.scss']
 })
 export class TestAddComponent implements OnInit, OnDestroy {
 
@@ -72,10 +72,9 @@ export class TestAddComponent implements OnInit, OnDestroy {
         Introduction: this.test.value.introduction,
         }, { params: { auth: true } }).subscribe({
         next: data => {
-          if (data.result) {
-            // save id move to next step
-            this.router.navigate(['/test-edit', data.id]);
-          }
+          // save id move to next step
+          this.router.navigate(['/test-edit', data.id]);
+          
           this.submitting = false;
         },
         error: (error: HttpErrorResponse) => {

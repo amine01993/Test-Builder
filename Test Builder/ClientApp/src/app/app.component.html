@@ -1,6 +1,8 @@
 <body>
-  <app-nav-menu></app-nav-menu>
-  <div class="container">
-    <router-outlet></router-outlet>
-  </div>
+  <ng-container *ngIf="layout === 'admin'">
+    <app-admin></app-admin>
+  </ng-container>
+  <ng-container *ngIf="layout === 'preview'">
+    <app-preview></app-preview>
+  </ng-container>
 </body>

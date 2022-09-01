@@ -1,0 +1,82 @@
+<div class="row g-3 shadow-sm">
+  <!--<div class="col-1">
+    <i class="bi bi-arrow-down-up" style="cursor: move;" cdkDragHandle></i>
+  </div>-->
+  <div class="col-9">
+    <div class="row">
+      <div class="col-12" [innerHTML]="question.Question">
+        <!-- question -->
+      </div>
+      <ng-container *ngIf="question.Answers">
+        <div *ngFor="let answer of question.Answers; let i = index;" class="col-12 mx-3 p-1"
+             [class.correct]="answer.Correct">
+          <!-- display answers + highlight right answers -->
+          <!-- Multiple choice -->
+          <ng-container *ngIf="question.TypeId === 1">
+            <div class="form-check">
+              <input [type]="question.Selection ? 'checkbox' : 'radio'"
+                     class="form-check-input" [id]="'answer' + key + '-' + i" [name]="'answer' + key" />
+              <label class="form-check-label" [for]="'answer' + key + '-' + i" [innerHTML]="answer._Answer"></label>
+            </div>
+          </ng-container>
+          <!-- True False -->
+          <ng-container *ngIf="question.TypeId === 2">
+            <div class="form-check">
+              <input type="radio"
+                     class="form-check-input" [id]="'answer' + key + '-' + i" [name]="'answer' + key" />
+              <label class="form-check-label" [for]="'answer' + key + '-' + i" [innerHTML]="answer._Answer"></label>
+            </div>
+          </ng-container>
+          <!-- Matching -->
+          <ng-container *ngIf="question.TypeId === 3">
+            <div class="row">
+              <div class="col-5" [innerHTML]="answer._Answer"></div>
+              <div class="col-2">
+                <i class="bi bi-arrow-right"></i>
+              </div>
+              <div class="col-5" [innerHTML]="answer.Match"></div>
+            </div>
+          </ng-container>
+          <!-- Free Text -->
+          <ng-container *ngIf="question.TypeId === 4">
+            <span [innerHTML]="answer._Answer"></span>
+          </ng-container>
+          <!-- Essay -->
+          <ng-container *ngIf="question.TypeId === 5">
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  <div class="col-3 text-end">
+    <!-- add question -->
+    <a [routerLink]="getEditRoute(question)" [class.disabled]="duplicating || deleting || usedInLoading"
+       class="btn btn-sm btn-success me-1" title="Edit Question">
+      <i class="bi bi-pencil-fill"></i>
+    </a>
+    <button class="btn btn-sm btn-light me-1" title="Duplicate Question"
+            [disabled]="duplicating || deleting || usedInLoading" (click)="OnDuplicateQuestion(question)">
+      <i *ngIf="!duplicating" class="bi bi-files"></i>
+      <span *ngIf="duplicating" class="spinner-border spinner-border-sm" role="status"></span>
+    </button>
+    <!-- delete question if used -->
+    <button class="btn btn-sm btn-danger" title="Delete Question"
+            [disabled]="duplicating || deleting || usedInLoading" (click)="OnDeleteQuestion(question)">
+      <i *ngIf="!deleting" class="bi bi-trash-fill"></i>
+      <span *ngIf="deleting" class="spinner-border spinner-border-sm" role="status"></span>
+    </button>
+    <br />
+    <ng-template #popTitle>Tests Used In</ng-template>
+    <ng-template #popContent>
+      <ul *ngIf="tests.length > 0" class="m-0 ps-3">
+        <li *ngFor="let test of tests">{{ test.Name }}</li>
+      </ul>
+    </ng-template>
+    <button class="btn btn-sm btn-link mt-2" title="Tests Used In"
+            [ngbPopover]="popContent" [popoverTitle]="popTitle" autoClose="outside"
+            [disabled]="duplicating || deleting || usedInLoading" (click)="OnUsedIn(question, null)">
+      <i class="bi bi-cursor-fill"></i> Used In
+      <span *ngIf="usedInLoading" class="spinner-border spinner-border-sm" role="status"></span>
+    </button>
+  </div>
+</div>

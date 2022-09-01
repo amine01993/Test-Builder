@@ -13,20 +13,21 @@ import { answerValidator, questionValidator } from '../question.validator';
 @Component({
   selector: 'app-free-text-add',
   templateUrl: './free-text-add.component.html',
-  styleUrls: ['./free-text-add.component.css']
+  styleUrls: ['./free-text-add.component.scss']
 })
 export class FreeTextAddComponent implements OnInit, OnDestroy {
 
-  _editorConfig: AngularEditorConfig = editorConfig;
   categories: Category[] = [];
   _categories: Category[] = [];
   _subCategories: Category[] = [];
+  _question: Question | undefined;
+
+  _editorConfig: AngularEditorConfig = editorConfig;
   categoriesSub: Subscription | undefined;
   serverErrors: { [key: string]: string } = {};
   submitting: boolean = false;
   pageId: number = 0;
   questionId: number = 0;
-  _question: Question | undefined;
   loading: boolean = false;
 
   freeText: FormGroup = new FormGroup({

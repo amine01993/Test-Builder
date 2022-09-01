@@ -11,7 +11,7 @@ import { Page, TestQuestion } from '../test.model';
 @Component({
   selector: 'app-page-edit',
   templateUrl: './page-edit.component.html',
-  styleUrls: ['./page-edit.component.css']
+  styleUrls: ['./page-edit.component.scss']
 })
 export class PageEditComponent implements OnInit {
 
@@ -38,7 +38,7 @@ export class PageEditComponent implements OnInit {
       next: params => {
         const pageId = params['page-id'];
         console.log('pageId', pageId);
-        this.httpClient.get<{ page: Page, questions: TestQuestion[] }>('api/page/get/' + pageId, { params: { auth: true } })
+        this.httpClient.get<{ page: Page, questions: TestQuestion[] }>('api/page/' + pageId, { params: { auth: true } })
           .subscribe({
             next: data => {
               this.page = data.page;

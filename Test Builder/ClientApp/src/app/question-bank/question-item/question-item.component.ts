@@ -8,13 +8,13 @@ import { Test, TestQuestion } from '../../test/test.model';
 @Component({
   selector: 'app-question-item',
   templateUrl: './question-item.component.html',
-  styleUrls: ['./question-item.component.css']
+  styleUrls: ['./question-item.component.scss']
 })
 export class QuestionItemComponent implements OnInit {
 
   @Input() question!: TestQuestion;
   @Input() key!: number;
-  @Output()reloadDataEvent = new EventEmitter<void>();
+  @Output() reloadDataEvent = new EventEmitter<void>();
 
   @Input() duplicating: boolean = false;
   @Input() deleting: boolean = false;
@@ -36,15 +36,15 @@ export class QuestionItemComponent implements OnInit {
   getEditRoute(question: TestQuestion): Array<string | number> {
     switch (question.TypeId) {
       case 1:
-        return ['/add-question', 0, 'multiple-choice', question.QuestionId!];
+        return ['/admin', 'add-question', 0, 'multiple-choice', question.QuestionId!];
       case 2:
-        return ['/add-question', 0, 'true-false', question.QuestionId!];
+        return ['/admin', 'add-question', 0, 'true-false', question.QuestionId!];
       case 3:
-        return ['/add-question', 0, 'matching', question.QuestionId!];
+        return ['/admin', 'add-question', 0, 'matching', question.QuestionId!];
       case 4:
-        return ['/add-question', 0, 'free-text', question.QuestionId!];
+        return ['/admin', 'add-question', 0, 'free-text', question.QuestionId!];
       case 5:
-        return ['/add-question', 0, 'essay', question.QuestionId!];
+        return ['/admin', 'add-question', 0, 'essay', question.QuestionId!];
     }
     return [];
   }

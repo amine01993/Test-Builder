@@ -13,20 +13,21 @@ import { answerValidator, questionValidator } from '../question.validator';
 @Component({
   selector: 'app-matching-add',
   templateUrl: './matching-add.component.html',
-  styleUrls: ['./matching-add.component.css']
+  styleUrls: ['./matching-add.component.scss']
 })
 export class MatchingAddComponent implements OnInit, OnDestroy {
 
-  _editorConfig: AngularEditorConfig = editorConfig;
   categories: Category[] = [];
   _categories: Category[] = [];
   _subCategories: Category[] = [];
+  _question: Question | undefined;
+
+  _editorConfig: AngularEditorConfig = editorConfig;
   categoriesSub: Subscription | undefined;
   serverErrors: { [key: string]: string } = {};
   submitting: boolean = false;
   pageId: number = 0;
   questionId: number = 0;
-  _question: Question | undefined;
   loading: boolean = false;
 
   matching: FormGroup = new FormGroup({

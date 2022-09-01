@@ -10,7 +10,7 @@ import { Page, Test } from '../test.model';
 @Component({
   selector: 'app-test-edit',
   templateUrl: './test-edit.component.html',
-  styleUrls: ['./test-edit.component.css']
+  styleUrls: ['./test-edit.component.scss']
 })
 export class TestEditComponent implements OnInit {
 

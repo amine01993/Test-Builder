@@ -15,11 +15,10 @@ import { Page, TestQuestion } from '../test/test.model';
 @Component({
   selector: 'app-question-bank',
   templateUrl: './question-bank.component.html',
-  styleUrls: ['./question-bank.component.css']
+  styleUrls: ['./question-bank.component.scss']
 })
 export class QuestionBankComponent implements OnInit, OnDestroy {
 
-  //test: Test | undefined;
   currentpage: Page | undefined;
 
   questionTypes: QuestionType[] = [];

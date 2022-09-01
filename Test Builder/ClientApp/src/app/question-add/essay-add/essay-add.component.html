@@ -1,7 +1,7 @@
 
 <form [formGroup]="essay" #form="ngForm" (ngSubmit)="OnSubmit()">
   <div class="row g-3 mb-4">
-    <div class="col-md-12">
+    <div class="col-12">
       <label class="form-label">Question</label>
       <div *ngIf="(form.submitted || question.touched) && question.errors"
            class="custom-inline invalid-feedback mx-3">
@@ -16,7 +16,7 @@
       <angular-editor formControlName="question" [config]="_editorConfig"></angular-editor>
     </div>
 
-    <div class="col-md-12">
+    <div class="col-12">
       <label class="form-label">Settings</label>
       <div class="card mb-3">
         <div class="card-body">
