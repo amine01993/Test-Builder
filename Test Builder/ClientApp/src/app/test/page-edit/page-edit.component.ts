@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationModalComponent } from '../../confirmation-modal/confirmation-modal.component';
 import { PageSettingsComponent } from '../page-settings/page-settings.component';
-import { Page, TestQuestion } from '../test.model';
+import { Page, PageQuestion } from '../test.model';
 
 @Component({
   selector: 'app-page-edit',
@@ -16,7 +16,7 @@ import { Page, TestQuestion } from '../test.model';
 export class PageEditComponent implements OnInit {
 
   page: Page | undefined;
-  testQuestions: TestQuestion[] = [];
+
   preview: FormControl = new FormControl(false);
   pageForm: FormGroup = new FormGroup({
     positions: new FormArray([])
@@ -38,13 +38,13 @@ export class PageEditComponent implements OnInit {
       next: params => {
         const pageId = params['page-id'];
         console.log('pageId', pageId);
-        this.httpClient.get<{ page: Page, questions: TestQuestion[] }>('api/page/' + pageId, { params: { auth: true } })
+        this.httpClient.get<Page>('api/page/' + pageId, { params: { auth: true } })
           .subscribe({
-            next: data => {
-              this.page = data.page;
-              this.testQuestions = data.questions;
-              for (const tq of this.testQuestions) {
-                this.positions.controls.push(new FormControl(tq.Position));
+            next: page => {
+              this.page = page;
+              //this.testQuestions = data.questions;
+              for (const pq of this.page.PageQuestions) {
+                this.positions.controls.push(new FormControl(pq.Position));
               }
             }
         });
@@ -82,52 +82,52 @@ export class PageEditComponent implements OnInit {
     if (event.previousIndex === event.currentIndex)
       return;
 
-    moveItemInArray(this.testQuestions, event.previousIndex, event.currentIndex);
+    moveItemInArray(this.page!.PageQuestions, event.previousIndex, event.currentIndex);
 
     let index = 0;
     const questionPositions = [];
-    for (const testQuestion of this.testQuestions) {
-      testQuestion.Position = index;
+    for (const pageQuestion of this.page!.PageQuestions) {
+      pageQuestion.Position = index;
       index++;
-      questionPositions.push({ Id: testQuestion.Id, _Position: testQuestion.Position });
+      questionPositions.push({ Id: pageQuestion.Id, _Position: pageQuestion.Position });
     }
     //this.moveItemInFormArray(this.positions, event.previousIndex, event.currentIndex);
 
-    this.httpClient.post<any>('api/test-question/positions', questionPositions, {
+    this.httpClient.post<any>('api/page-question/positions', questionPositions, {
       params: { auth: true }
     }).subscribe({
       next: data => { }
     });
 
-    console.log(this.testQuestions, this.positions.controls.map(c => c.value));
+    console.log(this.page!.PageQuestions, this.positions.controls.map(c => c.value));
   }
 
-  OnChangePosition(testQuestion: TestQuestion, positionIndex: number): void {
+  OnChangePosition(pageQuestion: PageQuestion, positionIndex: number): void {
     const positionControl = this.positions.at(positionIndex);
-    console.log(testQuestion, positionIndex, positionControl);
-    const oldPosition = testQuestion.Position, newPosition = +positionControl.value;
-    const targetQuestion = this.testQuestions.find(tq => tq.Position === newPosition);
+    console.log(pageQuestion, positionIndex, positionControl);
+    const oldPosition = pageQuestion.Position, newPosition = +positionControl.value;
+    const targetQuestion = this.page!.PageQuestions.find(pq => pq.Position === newPosition);
     const targetControl = this.positions.at(newPosition);
 
-    testQuestion.Position = newPosition;
+    pageQuestion.Position = newPosition;
     if (targetQuestion)
       targetQuestion.Position = oldPosition;
     targetControl.setValue(oldPosition);
 
-    const tmp = this.testQuestions[oldPosition];
-    this.testQuestions[oldPosition] = this.testQuestions[newPosition];
-    this.testQuestions[newPosition] = tmp;
+    const tmp = this.page!.PageQuestions[oldPosition];
+    this.page!.PageQuestions[oldPosition] = this.page!.PageQuestions[newPosition];
+    this.page!.PageQuestions[newPosition] = tmp;
 
     const tmp1 = this.positions.at(oldPosition);
     this.positions.controls[oldPosition] = this.positions.at(newPosition);
     this.positions.controls[newPosition] = tmp1;
 
     const questionPositions = [
-      { Id: testQuestion.Id, _Position: testQuestion.Position },
+      { Id: pageQuestion.Id, _Position: pageQuestion.Position },
       { Id: targetQuestion?.Id, _Position: targetQuestion?.Position },
     ];
 
-    this.httpClient.post<any>('api/test-question/positions', questionPositions, {
+    this.httpClient.post<any>('api/page-question/positions', questionPositions, {
       params: { auth: true }
     }).subscribe({
       next: data => { }
@@ -176,18 +176,18 @@ export class PageEditComponent implements OnInit {
       .catch(() => { });
   }
 
-  OnDeleteQuestion(testQuestion: TestQuestion): void {
+  OnDeleteQuestion(pageQuestion: PageQuestion): void {
     const confirmationRef = this.modal.open(ConfirmationModalComponent);
 
-    confirmationRef.componentInstance.content = 'Are you sure you want to delete question #' + testQuestion.Position + '?';
+    confirmationRef.componentInstance.content = 'Are you sure you want to delete question #' + pageQuestion.Position + '?';
 
     confirmationRef.result
       .then((ok: number) => {
         if (ok === 1) {
-          this.httpClient.delete('api/test-question/delete/' + testQuestion.Id, { params: { auth: true } }).subscribe({
+          this.httpClient.delete('api/page-question/delete/' + pageQuestion.Id, { params: { auth: true } }).subscribe({
             next: data => {
-              const index = this.testQuestions.findIndex(tq => tq.Id === testQuestion.Id);
-              this.testQuestions.splice(index, 1);
+              const index = this.page!.PageQuestions.findIndex(pq => pq.Id === pageQuestion.Id);
+              this.page!.PageQuestions.splice(index, 1);
               //for (let i = index; i < this.testQuestions.length; i++) {
               //  this.testQuestions[i].Position--;
               //}

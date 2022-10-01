@@ -9,6 +9,7 @@ namespace Test_Builder.Models
         [BelongTo("question_type", "id", ErrorMessage = "This Question type doesn't exist")]
         public int TypeId { get; set; }
         [BelongToCustomer("category", "id", ErrorMessage = "This Category doesn't exist")]
+        public QuestionType? QuestionType { get; set; }
         public int CategoryId { get; set; }
         [GreaterThan(0)]
         [GreaterThanOrEqualToProperty("Penalty")]
@@ -22,16 +23,16 @@ namespace Test_Builder.Models
         [Required]
         [StringLength(100000, MinimumLength = 5)]
         public string _Question { get; set; }
-        public Answer[]? Answers { get; set; }
+        public List<Answer>? Answers { get; set; }
     }
 
-    public class QuestionResult
-    {
-        public int Id { get; set; }
-        public string Question { get; set; }
-        public double Points { get; set; }
-        public string CategoryName { get; set; }
-        public string SubCategoryName { get; set; }
-        public string QuestionTypeName { get; set; }
-    }
+    //public class QuestionResult
+    //{
+    //    public int Id { get; set; }
+    //    public string Question { get; set; }
+    //    public double Points { get; set; }
+    //    public string CategoryName { get; set; }
+    //    public string SubCategoryName { get; set; }
+    //    public string QuestionTypeName { get; set; }
+    //}
 }

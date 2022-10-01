@@ -25,6 +25,12 @@ builder.Services.AddControllers(options =>
 builder.Services.AddSingleton<IDBHelper, DBHelper>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<IQuestionService, QuestionService>();
+builder.Services.AddSingleton<IQuestionTypeService, QuestionTypeService>();
+builder.Services.AddSingleton<ICategoryService, CategoryService>();
+builder.Services.AddSingleton<IPageQuestionService, PageQuestionService>();
+builder.Services.AddSingleton<IPageService, PageService>();
+builder.Services.AddSingleton<ITestService, TestService>();
+builder.Services.AddSingleton<IPreviewService, PreviewService>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
 

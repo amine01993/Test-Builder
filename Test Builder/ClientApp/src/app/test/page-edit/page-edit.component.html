@@ -49,7 +49,7 @@
 
 <form [formGroup]="pageForm">
   <div class="row page-drop-boundary m-2 mb-5 g-3" cdkDropList (cdkDropListDropped)="drop($event)" formArrayName="positions">
-    <div *ngFor="let testQuestion of testQuestions; let j = index;" class="col-12 p-0"
+    <div *ngFor="let pageQuestion of page!.PageQuestions; let j = index;" class="col-12 p-0"
          cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".page-drop-boundary">
       <div class="row g-3 shadow-sm">
         <div class="col-1">
@@ -57,23 +57,23 @@
         </div>
         <div class="col-8">
           <div class="row">
-            <div class="col-12 p-1" [innerHTML]="testQuestion.Question">
+            <div class="col-12 p-1" [innerHTML]="pageQuestion.Question!._Question">
               <!-- question -->
             </div>
-            <ng-container *ngIf="testQuestion.Answers">
-              <div *ngFor="let answer of testQuestion.Answers; let i = index;" class="col-12 p-1"
+            <ng-container *ngIf="pageQuestion.Question!.Answers">
+              <div *ngFor="let answer of pageQuestion.Question!.Answers; let i = index;" class="col-12 p-1"
                    [class.correct]="answer.Correct">
                 <!-- display answers + highlight right answers -->
                 <!-- Multiple choice -->
-                <ng-container *ngIf="testQuestion.TypeId === 1">
+                <ng-container *ngIf="pageQuestion.Question!.TypeId === 1">
                   <div class="form-check">
-                    <input [type]="testQuestion.Selection ? 'checkbox' : 'radio'"
+                    <input [type]="pageQuestion.Question!.Selection ? 'checkbox' : 'radio'"
                            class="form-check-input" [id]="'answer' + j + '-' + i" [name]="'answer' + j" />
                     <label class="form-check-label" [for]="'answer' + j + '-' + i" [innerHTML]="answer._Answer"></label>
                   </div>
                 </ng-container>
                 <!-- True False -->
-                <ng-container *ngIf="testQuestion.TypeId === 2">
+                <ng-container *ngIf="pageQuestion.Question!.TypeId === 2">
                   <div class="form-check">
                     <input type="radio"
                            class="form-check-input" [id]="'answer' + j + '-' + i" [name]="'answer' + j" />
@@ -81,7 +81,7 @@
                   </div>
                 </ng-container>
                 <!-- Matching -->
-                <ng-container *ngIf="testQuestion.TypeId === 3">
+                <ng-container *ngIf="pageQuestion.Question!.TypeId === 3">
                   <div class="row">
                     <div class="col-5" [innerHTML]="answer._Answer"></div>
                     <div class="col-2">
@@ -91,11 +91,11 @@
                   </div>
                 </ng-container>
                 <!-- Free Text -->
-                <ng-container *ngIf="testQuestion.TypeId === 4">
+                <ng-container *ngIf="pageQuestion.Question!.TypeId === 4">
                   <span [innerHTML]="answer._Answer"></span>
                 </ng-container>
                 <!-- Essay -->
-                <ng-container *ngIf="testQuestion.TypeId === 5">
+                <ng-container *ngIf="pageQuestion.Question!.TypeId === 5">
                 </ng-container>
               </div>
             </ng-container>
@@ -104,14 +104,14 @@
         <div class="col-3 text-end">
           <!-- set positon manually -->
           <select class="form-select form-select-sm d-inline me-1" style="width: fit-content;"
-                  formControlName="{{ testQuestion.Position }}"
-                  (change)="OnChangePosition(testQuestion, j)">
-            <option *ngFor="let _el of testQuestions; let k = index;" [value]="_el.Position">#{{ _el.Position }}</option>
+                  formControlName="{{ pageQuestion.Position }}"
+                  (change)="OnChangePosition(pageQuestion, j)">
+            <option *ngFor="let _el of page!.PageQuestions; let k = index;" [value]="_el.Position">#{{ _el.Position }}</option>
           </select>
           <!-- edit question -->
           <button class="btn btn-sm btn-success me-1"><i class="bi bi-pencil-fill"></i></button>
           <!-- delete question from page -->
-          <button class="btn btn-sm btn-danger" (click)="OnDeleteQuestion(testQuestion)">
+          <button class="btn btn-sm btn-danger" (click)="OnDeleteQuestion(pageQuestion)">
             <i class="bi bi-trash-fill"></i>
           </button>
         </div>

@@ -1,4 +1,4 @@
-<div class="row">
+<div *ngIf="test" class="row">
   <div class="col-3">
     <div class="row">
       <div class="col-6">
@@ -20,51 +20,33 @@
       </div>
 
       <div class="col-12">
-        <div class="col-6">
-          <i class="bi bi-file-earmark-text-fill"></i>
-          Page 1
-        </div>
-        <div class="col-6">
-          <span class="badge rounded-pill bg-light text-dark">
-            <i class="bi bi-info-circle-fill"></i>
-            3 / 5
-          </span>
-        </div>
-
-        <div class="col-6">
-          <i class="bi bi-file-earmark-text-fill"></i>
-          Page
-        </div>
-        <div class="col-6">
-          <span class="badge rounded-pill bg-light text-dark">
-            <i class="bi bi-info-circle-fill"></i>
-            1 / 8
-          </span>
-        </div>
-
-        <div class="col-6">
-          <i class="bi bi-file-earmark-text-fill"></i>
-          Page 3
-        </div>
-        <div class="col-6">
-          <span class="badge rounded-pill bg-light text-dark">
-            <i class="bi bi-info-circle-fill"></i>
-            0 / 2
-          </span>
-        </div>
+        <ng-container *ngFor="let page of test.Pages">
+          <div class="col-6">
+            <i class="bi bi-file-earmark-text-fill"></i>
+            {{ page.Name }}
+          </div>
+          <div class="col-6">
+            <span class="badge rounded-pill bg-light text-dark">
+              <i class="bi bi-info-circle-fill"></i>
+              0 / {{ page.PageQuestions.length }}
+            </span>
+          </div>
+        </ng-container>
       </div>
     </div>
     <hr />
 
     <div class="row">
       <div class="col-12">
-        Answered: 0 / 10
+        Answered: {{ answered }} / {{ totalQuestions }}
       </div>
       <div class="col-12">
-        Progress: 50%
+        Progress: {{ progress }}%
         <div class="progress">
           <div class="progress-bar progress-bar-striped" role="progressbar"
-               style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+               style="width:{{ progress }}%"
+               [attr.aria-valuenow]="progress"
+               [attr.aria-valuemin]="0" [attr.aria-valuemax]="100"></div>
         </div>
       </div>
     </div>
@@ -105,7 +87,7 @@
     <div class="row">
       <div class="col-12">
         <!-- test name -->
-        Math 1
+        {{ test.Name }}
       </div>
 
       <div class="col-1">
@@ -114,13 +96,16 @@
       <div class="col-11">
         <div class="row">
           <div class="col-6">
-            Page 2 / 3: Page Name 2
+            Page {{ currentPageIndex + 1 }} / {{ test.Pages.length }}: {{ test.Pages[currentPageIndex] }}
           </div>
           <div class="col-3">
             <i class="bi bi-clock-fill"></i> Remaining Time for Page
           </div>
           <div class="col-3">
-            1 minute, 29 seconds
+            <!--1 minute, 29 seconds-->
+            <ng-container *ngIf="remainingTime">
+              {{ remainingTime }} seconds
+            </ng-container>
           </div>
         </div>
       </div>

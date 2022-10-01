@@ -1,16 +1,14 @@
-import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { OnDestroy } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { Category } from '../category/category.model';
 import { CategoryService } from '../category/category.service';
-import { ConfirmationModalComponent } from '../confirmation-modal/confirmation-modal.component';
-import { DataResult, QuestionType } from '../question-add/question.model';
+import { DataResult, Question, QuestionType } from '../question-add/question.model';
 import { QuestionService } from '../question-add/question.service';
-import { Page, TestQuestion } from '../test/test.model';
+import { Page } from '../test/test.model';
 
 @Component({
   selector: 'app-question-bank',
@@ -18,8 +16,6 @@ import { Page, TestQuestion } from '../test/test.model';
   styleUrls: ['./question-bank.component.scss']
 })
 export class QuestionBankComponent implements OnInit, OnDestroy {
-
-  currentpage: Page | undefined;
 
   questionTypes: QuestionType[] = [];
   categories: Category[] = [];
@@ -33,13 +29,12 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
   page: number = 1;
   pageSize: number = 10;
   filter: { [key: string]: string } = {};
-  questions: TestQuestion[] = [];
+  questions: Question[] = [];
 
   pageControl: FormControl = new FormControl(1);
   pageSizeControl: FormControl = new FormControl(10);
   pages: number[] = [];
   pageSizes: number[] = [5, 10, 20, 50];
-
 
   filterForm: FormGroup = new FormGroup({
     status: new FormControl(0),
@@ -180,7 +175,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
   }
 
   LoadData(): void {
-    this.httpClient.get<DataResult<TestQuestion>>('api/question/search', {
+    this.httpClient.get<DataResult<Question>>('api/question/search', {
       params: {
         auth: true,
         page: this.page, pageSize: this.pageSize,
@@ -198,7 +193,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
   OnPageChange(): void {
     this.page = +this.pageControl.value;
 
-    this.router.navigate(['/question-bank'], {
+    this.router.navigate(['/admin/question-bank'], {
       queryParams: {
         _filter: this.encodeParam(this.filter),
         page: this.page,
@@ -208,7 +203,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
   }
 
   OnPreviousPage(): void {
-    this.router.navigate(['/question-bank'], {
+    this.router.navigate(['/admin/question-bank'], {
       queryParams: {
         _filter: this.encodeParam(this.filter),
         page: this.page - 1,
@@ -218,7 +213,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
   }
 
   OnNextPage(): void {
-    this.router.navigate(['/question-bank'], {
+    this.router.navigate(['/admin/question-bank'], {
       queryParams: {
         _filter: this.encodeParam(this.filter),
         page: this.page + 1,
@@ -229,7 +224,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
 
   OnPageSizeChange(): void {
     this.pageSize = +this.pageSizeControl.value;
-    this.router.navigate(['/question-bank'], {
+    this.router.navigate(['/admin/question-bank'], {
       queryParams: {
         _filter: this.encodeParam(this.filter),
         page: 1,
@@ -253,7 +248,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
         term: this.filterForm.value.searchTerm,
       };
 
-      this.router.navigate(['/question-bank'], {
+      this.router.navigate(['/admin/question-bank'], {
         queryParams: {
           _filter: this.encodeParam(this.filter)
         }

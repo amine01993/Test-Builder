@@ -1,9 +1,10 @@
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationModalComponent } from '../../confirmation-modal/confirmation-modal.component';
-import { Test, TestQuestion } from '../../test/test.model';
+import { Question } from '../../question-add/question.model';
+import { Test } from '../../test/test.model';
 
 @Component({
   selector: 'app-question-item',
@@ -12,7 +13,7 @@ import { Test, TestQuestion } from '../../test/test.model';
 })
 export class QuestionItemComponent implements OnInit {
 
-  @Input() question!: TestQuestion;
+  @Input() question!: Question;
   @Input() key!: number;
   @Output() reloadDataEvent = new EventEmitter<void>();
 
@@ -31,32 +32,33 @@ export class QuestionItemComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log(this.question);
   }
 
-  getEditRoute(question: TestQuestion): Array<string | number> {
+  getEditRoute(question: Question): Array<string | number> {
     switch (question.TypeId) {
       case 1:
-        return ['/admin', 'add-question', 0, 'multiple-choice', question.QuestionId!];
+        return ['/admin', 'add-question', 0, 'multiple-choice', question.Id!];
       case 2:
-        return ['/admin', 'add-question', 0, 'true-false', question.QuestionId!];
+        return ['/admin', 'add-question', 0, 'true-false', question.Id!];
       case 3:
-        return ['/admin', 'add-question', 0, 'matching', question.QuestionId!];
+        return ['/admin', 'add-question', 0, 'matching', question.Id!];
       case 4:
-        return ['/admin', 'add-question', 0, 'free-text', question.QuestionId!];
+        return ['/admin', 'add-question', 0, 'free-text', question.Id!];
       case 5:
-        return ['/admin', 'add-question', 0, 'essay', question.QuestionId!];
+        return ['/admin', 'add-question', 0, 'essay', question.Id!];
     }
     return [];
   }
 
-  OnDuplicateQuestion(question: TestQuestion): void {
+  OnDuplicateQuestion(question: Question): void {
     this.duplicating = true;
 
-    this.httpClient.post<{ questionId: number }>('api/question/duplicate/' + question.QuestionId, {}, { params: { auth: true } })
+    this.httpClient.post<{ questionId: number }>('api/question/duplicate/' + question.Id, {}, { params: { auth: true } })
       .subscribe({
         next: data => {
           // navigate to edit page of the new question
-          const editRoute = this.getEditRoute({ ...question, ...{ QuestionId: data.questionId } });
+          const editRoute = this.getEditRoute({ ...question, ...{ Id: data.questionId } });
           const url = this.router.serializeUrl(this.router.createUrlTree(editRoute));
           console.log('duplicate edit url', url);
           window.open(url, '_blank');
@@ -71,7 +73,7 @@ export class QuestionItemComponent implements OnInit {
     });
   }
 
-  OnDeleteQuestion(question: TestQuestion): void {
+  OnDeleteQuestion(question: Question): void {
     const modalRef = this.modal.open(ConfirmationModalComponent);
 
     modalRef.componentInstance.title = "Deleting Question";
@@ -81,7 +83,7 @@ export class QuestionItemComponent implements OnInit {
       console.log('result', result);
       if (result === 1) {
         this.deleting = true;
-        this.httpClient.delete<any>('api/question/delete/' + question.QuestionId, { params: { auth: true } }).subscribe({
+        this.httpClient.delete<any>('api/question/delete/' + question.Id, { params: { auth: true } }).subscribe({
           next: data => {
             // reload list
             this.reloadDataEvent.emit();
@@ -100,11 +102,11 @@ export class QuestionItemComponent implements OnInit {
     });
   }
 
-  OnUsedIn(question: TestQuestion, p: any): void {
+  OnUsedIn(question: Question, p: any): void {
     //console.log(this.popover);
 
     this.usedInLoading = true;
-    this.httpClient.get<Test[]>('api/question/used-in/' + question.QuestionId, { params: { auth: true } }).subscribe({
+    this.httpClient.get<Test[]>('api/question/used-in/' + question.Id, { params: { auth: true } }).subscribe({
       next: tests => {
         console.log(tests);
         this.tests = tests;

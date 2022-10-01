@@ -15,14 +15,14 @@ namespace Test_Builder.Profiles
             CategoryMapping();
             PageMapping();
             TestMapping();
-            TestQuestionMapping();
+            PageQuestionMapping();
             AnswerMapping();
             QuestionMapping();
         }
 
         void PrimitiveTypesMapping()
         {
-            CreateMap<DataRow, int?>().ForMember(d => d.Value, o => o.MapFrom(s => s["Nbr"]));
+            CreateMap<DataRow, PrimitiveType<int>>().ForMember(d => d.Value, o => o.MapFrom(s => s[s.Table.Columns[0].ColumnName]));
         }
 
         void CustomerMapping()
@@ -36,10 +36,10 @@ namespace Test_Builder.Profiles
 
         void QuestionTypeMapping() {
             CreateMap<DataRow, QuestionType>()
-                .ForMember(d => d.Id, o => o.MapFrom(s => s["Id"]))
-                .ForMember(d => d.Name, o => o.MapFrom(s => s["Name"]))
-                .ForMember(d => d.Icon, o => o.MapFrom(s => s["Icon"]))
-                .ForMember(d => d.Link, o => o.MapFrom(s => s["Link"]))
+                .ForMember(d => d.Id, o => o.MapFrom(s => MapProperty(s, "QuestionType", "Id"))) // s[Id]
+                .ForMember(d => d.Name, o => o.MapFrom(s => MapProperty(s, "QuestionType", "Name")))
+                .ForMember(d => d.Icon, o => o.MapFrom(s => s.Table.Columns.Contains("Icon") ? s["Icon"] : null))
+                .ForMember(d => d.Link, o => o.MapFrom(s => s.Table.Columns.Contains("Link") ? s["Link"] : null))
                 ;
         }
 
@@ -68,13 +68,16 @@ namespace Test_Builder.Profiles
         void QuestionMapping()
         {
             CreateMap<DataRow, Question>()
-                .ForMember(d => d.TypeId, o => o.MapFrom(s => s["TypeId"]))
-                .ForMember(d => d.CategoryId, o => o.MapFrom(s => s["CategoryId"]))
-                .ForMember(d => d.Points, o => o.MapFrom(s => s["Points"]))
-                .ForMember(d => d.Penalty, o => o.MapFrom(s => s["Penalty"] == DBNull.Value ? null : s["Penalty"]))
-                .ForMember(d => d.Shuffle, o => o.MapFrom(s => s["Shuffle"] == DBNull.Value ? null : s["Shuffle"]))
-                .ForMember(d => d.Selection, o => o.MapFrom(s => s["Selection"] == DBNull.Value ? null : s["Selection"]))
-                .ForMember(d => d._Question, o => o.MapFrom(s => s["_Question"]));
+                .ForMember(d => d.Id, o => o.MapFrom(s => MapProperty(s, "Question", "Id")))
+                .ForMember(d => d.TypeId, o => o.MapFrom(s => MapProperty(s, "Question", "TypeId")))
+                .ForMember(d => d.QuestionType, o => o.MapFrom(s => s))
+                .ForMember(d => d.CategoryId, o => o.MapFrom(s => MapProperty(s, "Question", "CategoryId")))
+                .ForMember(d => d.Points, o => o.MapFrom(s => MapProperty(s, "Question", "Points")))
+                .ForMember(d => d.Penalty, o => o.MapFrom(s => MapProperty(s, "Question", "Penalty")))
+                .ForMember(d => d.Shuffle, o => o.MapFrom(s => MapProperty(s, "Question", "Shuffle")))
+                .ForMember(d => d.Selection, o => o.MapFrom(s => MapProperty(s, "Question", "Selection")))
+                .ForMember(d => d._Question, o => o.MapFrom(s => MapProperty(s, "Question", "_Question")))
+                ;
         }
 
         void TestMapping()
@@ -85,22 +88,19 @@ namespace Test_Builder.Profiles
                 ;
         }
 
-        void TestQuestionMapping()
+        void PageQuestionMapping()
         {
-            CreateMap<DataRow, TestQuestion>()
+            CreateMap<DataRow, PageQuestion>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s["Id"]))
                 .ForMember(d => d.Position, o => o.MapFrom(s => s["Position"]))
                 .ForMember(d => d.Random, o => o.MapFrom(s => s["Random"]))
 
                 .ForMember(d => d.QuestionId, o => o.MapFrom(s => s["QuestionId"] == DBNull.Value ? null : s["QuestionId"]))
-                .ForMember(d => d.Question, o => o.MapFrom(s => s["Question"]))
-                .ForMember(d => d.Selection, o => o.MapFrom(s => s["Selection"] == DBNull.Value ? null : s["Selection"]))
+                .ForMember(d => d.Question, o => o.MapFrom(s => s))
 
                 .ForMember(d => d.QuestionIds, o => o.MapFrom(s => s["QuestionIds"] == DBNull.Value ? null : s["QuestionIds"]))
                 .ForMember(d => d.Number, o => o.MapFrom(s => s["Number"] == DBNull.Value ? null : s["Number"]))
 
-                .ForMember(d => d.TypeId, o => o.MapFrom(s => s["TypeId"] == DBNull.Value ? null : s["TypeId"]))
-                .ForMember(d => d.TypeName, o => o.MapFrom(s => s["TypeName"]))
 
                 //.ForMember(d => d.CategoryId, o => o.Ignore())
                 //.ForMember(d => d.SubCategoryId, o => o.Ignore())
@@ -118,6 +118,33 @@ namespace Test_Builder.Profiles
                 .ForMember(d => d.Position, o => o.MapFrom(s => s["Position"]))
                 .ForMember(d => d.TestId, o => o.MapFrom(s => s["TestId"]))
                 ;
+        }
+
+        private object MapProperty(DataRow dr, string mapping, string property)
+        {
+            var name = dr.Table.TableName;
+            string propertyFullName = property;
+            if(mapping == "QuestionType")
+            {
+                if(name == "Question")
+                {
+                    propertyFullName = mapping + "." + property;
+                }
+                else if(name == "PageQuestion")
+                {
+                    propertyFullName = "Question." + mapping + "." + property;
+                }
+            }
+            else if(mapping == "Question")
+            {
+                if (name == "PageQuestion")
+                {
+                    propertyFullName = mapping + "." + property;
+                }
+            }
+            if (dr.Table.Columns.Contains(propertyFullName) && dr[propertyFullName] != DBNull.Value)
+                return dr[propertyFullName];
+            return null;
         }
     }
 }

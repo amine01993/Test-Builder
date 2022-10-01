@@ -33,9 +33,9 @@
     Questions: 3 Fixed + 2 Auto selected at random on start
   </div>-->
   <!-- pages list + actions -->
-  <div class="col-12">
+  <div *ngIf="test" class="col-12">
     <div class="row page-drop-boundary" cdkDropList (cdkDropListDropped)="drop($event)">
-      <div *ngFor="let page of pages; let i = index;" class="col-12"
+      <div *ngFor="let page of test!.Pages; let i = index;" class="col-12"
            cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".page-drop-boundary">
         <div class="row align-items-end shadow-sm p-2">
           <!-- drag + drop -->

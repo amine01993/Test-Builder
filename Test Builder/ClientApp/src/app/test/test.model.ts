@@ -2,6 +2,7 @@
 export interface Test {
   Id: number;
   Name: string;
+  Pages: Page[];
 }
 
 export interface Page {
@@ -11,21 +12,30 @@ export interface Page {
   Name: string;
   Shuffle: boolean;
   TestId: number;
+  PageQuestions: PageQuestion[];
 }
 
-export interface TestQuestion {
+export interface PageQuestion {
   Id: number;
   Position: number;
   Random: boolean;
   QuestionId: number | null;
   QuestionIds: string | null;
   Number: number | null;
+  Question: Question | null;        
+}
 
-  TypeId: number | null;
-  TypeName: string | null;
-  Question: string | null;
+export interface Question {
+  Id: number;
+  TypeId: number;
   Selection: number | null;
+  _Question: string;
   Answers: Answer[] | null;
+  QuestionType: QuestionType;
+}
+
+export interface QuestionType {
+  Name: string;
 }
 
 export interface Answer {

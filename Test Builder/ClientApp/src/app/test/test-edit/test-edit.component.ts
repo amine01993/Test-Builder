@@ -15,7 +15,7 @@ import { Page, Test } from '../test.model';
 export class TestEditComponent implements OnInit {
 
   test: Test | undefined;
-  pages: Page[] = [];
+  //pages: Page[] = [];
 
   serverErrors: { [key: string]: string } = {};
   loading: boolean[] = [];
@@ -29,11 +29,10 @@ export class TestEditComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe({
       next: params => {
-        this.httpClient.get<{ test: Test, pages: Page[] }>('api/test/' + params['id'], { params: { auth: true } }).subscribe({
+        this.httpClient.get<Test>('api/test/' + params['id'], { params: { auth: true } }).subscribe({
           next: data => {
-            this.test = data.test;
-            this.pages = data.pages;
-            this.loading = Array(this.pages.length).fill(false);
+            this.test = data;
+            this.loading = Array(this.test.Pages.length).fill(false);
           }
         });
       }
@@ -43,13 +42,13 @@ export class TestEditComponent implements OnInit {
   OnAddNewPage(): void {
     const pageRef = this.modal.open(PageSettingsComponent, { size: 'lg' });
 
-    pageRef.componentInstance.testId = this.test?.Id;
-    pageRef.componentInstance.position = this.pages[this.pages.length - 1].Position + 1;
+    pageRef.componentInstance.testId = this.test!.Id;
+    pageRef.componentInstance.position = this.test!.Pages[this.test!.Pages.length - 1].Position + 1;
 
     pageRef.result
       .then(page => {
         console.log('page', page);
-        this.pages.push(page);
+        this.test!.Pages.push(page);
         this.loading.push(false);
       })
       .catch(c => {
@@ -83,12 +82,12 @@ export class TestEditComponent implements OnInit {
     confirmationRef.result
       .then((ok: number) => {
         if (ok === 1) {
-          const index = this.pages.indexOf(page);
+          const index = this.test!.Pages.indexOf(page);
           this.loading[index] = true;
           this.httpClient.delete('api/page/delete/' + page.Id, { params: { auth: true, testId: page.TestId } }).subscribe({
             next: data => {
               //this.loading[index] = false;
-              this.pages.splice(index, 1);
+              this.test!.Pages.splice(index, 1);
               this.loading.splice(index, 1);
             },
             error: (error: HttpErrorResponse) => {
@@ -105,12 +104,12 @@ export class TestEditComponent implements OnInit {
     if (event.previousIndex === event.currentIndex || !this.test)
       return;
 
-    moveItemInArray(this.pages, event.previousIndex, event.currentIndex);
+    moveItemInArray(this.test!.Pages, event.previousIndex, event.currentIndex);
 
     const pagePositions = [];
-    for (let i = 0; i < this.pages.length; i++) {
-      this.pages[i].Position = i;
-      pagePositions.push({ Id: this.pages[i].Id, _Position: this.pages[i].Position });
+    for (let i = 0; i < this.test!.Pages.length; i++) {
+      this.test!.Pages[i].Position = i;
+      pagePositions.push({ Id: this.test!.Pages[i].Id, _Position: this.test!.Pages[i].Position });
     }
 
     this.httpClient.post<any>('api/page/positions', pagePositions, {

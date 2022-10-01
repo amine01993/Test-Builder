@@ -74,9 +74,9 @@ namespace Test_Builder.Services
             var list = ConvertDataTable<T>(table);
             return list.Count > 0 ? list[0] : default;
         }
-        public T? Query2<T>(string sql, Dictionary<string, object> parameters = null)
+        public T? Query2<T>(string sql, Dictionary<string, object> parameters = null, string dataTableName = "")
         {
-            DataTable table = new DataTable();
+            DataTable table = new DataTable(dataTableName);
             string sqlDataSource = _configuration.GetConnectionString(connectionString);
             SqlDataReader reader;
             using (SqlConnection connection = new SqlConnection(sqlDataSource))
@@ -133,9 +133,9 @@ namespace Test_Builder.Services
 
             return ConvertDataTable2<T>(table);
         }
-        public List<T> QueryList2<T>(string sql, Dictionary<string, object> parameters = null)
+        public List<T> QueryList2<T>(string sql, Dictionary<string, object> parameters = null, string dataTableName = "")
         {
-            DataTable table = new DataTable();
+            DataTable table = new DataTable(dataTableName);
             string sqlDataSource = _configuration.GetConnectionString(connectionString);
             SqlDataReader reader;
             using (SqlConnection connection = new SqlConnection(sqlDataSource))
@@ -165,127 +165,6 @@ namespace Test_Builder.Services
                 data.Add(_mapper.Map<T>(el));
             }
             return data;
-        }
-
-        public DataResult<TestQuestion> GetDataResult(string sql, DataParameters parameters)
-        {
-            var sqlParameters = new Dictionary<string, object>() 
-            { { "customer_id", _httpContextAccessor.HttpContext.User.Identity.Name } };
-            
-            IDictionary<string, string> filter = parameters.decodeFilter();
-            //IDictionary<string, string> orderBy = parameters.decodeParam(parameters._orderBy);
-
-            foreach (var item in filter)
-            {
-                if (!string.IsNullOrEmpty(item.Value))
-                {
-                    //string[] values;
-                    //IList<string> paramList;
-                    switch (item.Key)
-                    {
-                        case "status":
-                            if (item.Value == "0") {
-                                sql = sql.Replace("#status", "");
-                            }
-                            else if (item.Value == "1") {
-                                sql = sql.Replace("#status", "AND tq.id IS NOT NULL");
-                            }
-                            else if (item.Value == "2") {
-                                sql = sql.Replace("#status", "AND tq.id IS NULL");
-                            }
-                            break;
-                        case "type":
-                            if(item.Value == "0")
-                                sql = sql.Replace("#questionType", "");
-                            else
-                            {
-                                sqlParameters.Add("type", item.Value);
-                                sql = sql.Replace("#questionType", "AND qt.id = @type");
-                            }
-                            break;
-                        case "category":
-                            if (item.Value == "0")
-                                sql = sql.Replace("#category", "");
-                            else
-                            {
-                                sqlParameters.Add("category", item.Value);
-                                sql = sql.Replace("#category", "AND c.id = @category");
-                            }
-                            break;
-                        case "subCategory":
-                            if (item.Value == "0")
-                                sql = sql.Replace("#subCategory", "");
-                            else
-                            { 
-                                sqlParameters.Add("subCategory", item.Value);
-                                sql = sql.Replace("#subCategory", "AND sc.id = @subCategory");
-                            }
-                            break;
-                        case "term":
-                            sqlParameters.Add("term", "%" + item.Value + "%");
-                            sql = sql.Replace("#searchTerm", "AND q.question LIKE @term");
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-
-            sql = sql.Replace("#status", "").Replace("#questionType", "").Replace("#category", "")
-                .Replace("#subCategory", "").Replace("#searchTerm", "");
-
-            //var orderList = new List<string>();
-            //foreach(var item in orderBy)
-            //{
-            //    orderList.Add($"{item.Key} {item.Value}");
-            //}
-            //var orderStr = orderList.Count == 0 ? "" : "ORDER BY " + string.Join(", ", orderList);
-
-            var totalQuery = $@"SELECT COUNT(*) FROM ({sql}) as t";
-            var total = Query<int>(totalQuery, sqlParameters);
-
-            var query = $@"{sql} 
-                ORDER BY QuestionId
-                OFFSET {(parameters.page - 1) * parameters.pageSize} ROWS 
-                FETCH NEXT {parameters.pageSize} ROWS ONLY";
-            var list = QueryList2<TestQuestion>(query, sqlParameters); // test questions results
-
-            var paramDict = new Dictionary<string, object> 
-                { { "customer_id", _httpContextAccessor.HttpContext.User.Identity.Name } };
-            var inList = new List<string>() { "0" };
-            var index = 0;
-
-            foreach (var question in list)
-            {
-                if (question.QuestionId.HasValue)
-                {
-                    paramDict.Add("question_" + index, question.QuestionId);
-                    inList.Add("@question_" + index++);
-                }
-            }
-
-            var answers = QueryList2<Answer>(
-                $@"SELECT a.id AS Id, a.answer AS _Answer, a.correct AS Correct, a.match AS Match,
-                    a.points AS Points, a.penalty AS Penalty, a.question_id AS QuestionId
-                FROM answer a
-                WHERE a.question_id IN ({string.Join(',', inList)}) AND a.customer_id = @customer_id
-                ORDER BY a.question_id", paramDict
-            );
-
-            index = 0;
-            foreach (var question in list)
-            {
-                while (index < answers.Count && answers[index].QuestionId == question.QuestionId)
-                {
-                    if (question.Answers == null)
-                        question.Answers = new List<Answer>();
-                    question.Answers.Add(answers[index++]);
-                }
-            }
-
-            var result = new DataResult<TestQuestion>() { Total = total, Count = list.Count, Data = list };
-
-            return result;
         }
 
         private List<T> ConvertDataTable2<T>(DataTable dt)

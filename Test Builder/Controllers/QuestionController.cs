@@ -20,12 +20,9 @@ namespace Test_Builder.Controllers
 
         // Get: api/question/types
         [HttpGet("types")]
-        public IActionResult GetTypes()
+        public IActionResult GetTypes([FromServices] IQuestionTypeService questionTypeService)
         {
-            var questionTypes = dBHelper.QueryList2<QuestionType>(
-                @"SELECT id AS Id, name AS Name, icon AS Icon, link AS Link 
-                FROM question_type"
-            );
+            var questionTypes = questionTypeService.List();
 
             return new JsonResult(questionTypes);
         }
@@ -33,24 +30,9 @@ namespace Test_Builder.Controllers
         // Get: api/question/search
         [HttpGet("search")]
         [Authorize]
-        public IActionResult Search([FromQuery] DataParameters parameters)
+        public IActionResult Search([FromServices] IQuestionService questionService, [FromQuery] DataParameters parameters)
         {
-            var query =
-                @"SELECT ISNULL(tq.id, 0) AS Id, ISNULL(tq.position, 0) AS Position,
-                    q.id AS QuestionId, q.question AS Question, q.selection AS Selection,
-                    qt.id AS TypeId, qt.name AS TypeName,
-                    0 AS Random, NULL AS QuestionIds, NULL AS Number
-                FROM question q
-                INNER JOIN category sc ON sc.id = q.category_id 
-                                AND (sc.customer_id = @customer_id OR sc.customer_id IS NULL) #subCategory
-                INNER JOIN category c ON c.id = sc.parent_id 
-                                AND (c.customer_id = @customer_id OR c.customer_id IS NULL) #category
-                INNER JOIN question_type qt ON qt.id = q.type_id #questionType
-                
-                LEFT JOIN test_question tq ON tq.question_id = q.id AND tq.customer_id = @customer_id #status
-                WHERE q.customer_id = @customer_id #searchTerm";
-
-            var result = dBHelper.GetDataResult(query, parameters);
+            var result = questionService.Search(parameters);
 
             return new JsonResult(result);
         }
@@ -58,7 +40,11 @@ namespace Test_Builder.Controllers
         // Post: api/question/add/1
         [HttpPost("add/{pageId?}")]
         [Authorize]
-        public IActionResult Add([FromServices] IQuestionService questionService, [FromBody] Question question, int? pageId)
+        public IActionResult Add(
+            [FromServices] IQuestionService questionService,
+            [FromServices] IPageQuestionService pageQuestionService,
+            [FromBody] Question question, int? pageId
+        )
         {
             if (ModelState.IsValid)
             {
@@ -66,34 +52,14 @@ namespace Test_Builder.Controllers
 
                 if(pageId.HasValue)
                 {
-                    var testQuestion = new TestQuestion { PageId = pageId.Value, Random = false, QuestionId = questionId };
+                    var pageQuestion = new PageQuestion { PageId = pageId.Value, Random = false, QuestionId = questionId };
 
-                    if(TryValidateModel(testQuestion))
+                    if(TryValidateModel(pageQuestion))
                     {
-                        var maxPosition = dBHelper.Query<int>(
-                            @"SELECT ISNULL(MAX(position) + 1, 0) AS Nbr
-                            FROM test_question
-                            WHERE page_id = @page_id AND customer_id = @customer_id",
-                            new Dictionary<string, object>() { { "page_id", pageId }, { "customer_id", User.Identity.Name } }
-                        );
+                        var maxPosition = pageQuestionService.MaxPosition(pageId.Value);
+                        pageQuestion.Position = maxPosition;
 
-                        dBHelper.Write(@"
-                            INSERT INTO test_question(page_id, position, random, question_id, 
-                                category_id, subcategory_id, type_id, number, question_ids, customer_id)
-                            OUTPUT INSERTED.id
-                            VALUES(@page_id, @position, @random, @question_id, 
-                                @category_id, @subcategory_id, @type_id, @number, @question_ids, @customer_id)",
-                            new Dictionary<string, object> { { "page_id", testQuestion.PageId }, 
-                                { "random", testQuestion.Random },
-                                { "question_id", testQuestion.QuestionId },
-                                { "category_id", DBNull.Value },
-                                { "subcategory_id", DBNull.Value },
-                                { "type_id", DBNull.Value },
-                                { "number", DBNull.Value },
-                                { "question_ids", DBNull.Value },
-                                { "customer_id", User.Identity.Name }, { "position", maxPosition }
-                            }
-                        );
+                        pageQuestionService.Insert(pageQuestion);
                     }
                     else
                     {
@@ -140,7 +106,7 @@ namespace Test_Builder.Controllers
             var questionId = questionService.Duplicate(id);
 
             if (questionId == null)
-                return new JsonResult(new { }) { StatusCode = 404 };
+                return new JsonResult(null) { StatusCode = 404 };
 
             return new JsonResult(new { questionId });
         }
@@ -155,7 +121,7 @@ namespace Test_Builder.Controllers
             if (result == 1)
                 return new JsonResult(new { message = "Can't delete this question, it is used in other tests." }) { StatusCode = 409 };
 
-            return new JsonResult(new { });
+            return new JsonResult(null);
         }
 
         // Get: api/question/used-in/1
@@ -178,7 +144,7 @@ namespace Test_Builder.Controllers
             var question = questionService.Get(id);
 
             if (question == null)
-                return new JsonResult(new { }) { StatusCode = 404 };
+                return new JsonResult(null) { StatusCode = 404 };
 
             return new JsonResult(question);
         }

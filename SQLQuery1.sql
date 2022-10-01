@@ -225,41 +225,25 @@
 --JOIN INSERTED ON test_question.id = INSERTED.id;
 --GO
 
+--use TestBuilderDb;
+--GO
+--EXEC sp_rename 'dbo.test_question', 'page_question';
 
---SELECT id AS Id, name AS Name, limit AS Limit, position AS Position, 
---    shuffle AS Shuffle, test_id AS TestId
---FROM page
---WHERE id = 1 AND customer_id = 1
---ORDER BY position
+--DROP TRIGGER set_test_question_updated_at;  
 
---SELECT tq.id AS Id, tq.position AS Position, tq.random AS Random, tq.question_id AS QuestionId,
---    tq.question_ids AS QuestionIds, tq.number AS Number,
---    q.id AS QuestionId, q.question AS Question,
---    qt.id AS TypeId, qt.name AS TypeName
---FROM test_question tq
---LEFT JOIN question q ON q.id = tq.question_id AND q.customer_id = 1
---LEFT JOIN question_type qt ON qt.id = q.type_id
---WHERE tq.page_id = 1 AND tq.customer_id = 1
---ORDER BY tq.question_id
+--CREATE TRIGGER set_page_question_updated_at ON page_question
+--AFTER UPDATE
+--NOT FOR REPLICATION
+--AS 
+--UPDATE page_question
+--SET updated_at = SYSDATETIME()
+--FROM page_question
+--JOIN INSERTED ON page_question.id = INSERTED.id;
+--GO
 
---select ISNULL( max(position) + 1, 0 ) from test_question where page_id = 456
-
---SELECT tq.id AS Id, tq.position AS Position, tq.random AS Random, tq.question_id AS QuestionId,
---    tq.question_ids AS QuestionIds, tq.number AS Number,
---    q.id AS QuestionId, q.question AS Question, q.selection AS Selection,
---    qt.id AS TypeId, qt.name AS TypeName
---FROM test_question tq
---LEFT JOIN question q ON q.id = tq.question_id AND q.customer_id = 1
---LEFT JOIN question_type qt ON qt.id = q.type_id
---WHERE tq.page_id = 1 AND tq.customer_id = 1
---ORDER BY tq.question_id
-
---SELECT a.id AS Id, a.answer AS _Answer, a.correct AS Correct, a.match AS Match,
---    a.points AS Points, a.penalty AS Penalty, a.question_id AS QuestionId
---FROM answer a
---WHERE a.question_id IN (21, 22, 23, 24, 25, 26) AND a.customer_id = 1
---ORDER BY a.question_id
-
+--ALTER TABLE test 
+--DROP COLUMN limit;
+--GO
 
 
 
