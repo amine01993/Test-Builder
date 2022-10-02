@@ -7,6 +7,7 @@ namespace Test_Builder.Services
     public interface IQuestionService
     {
         public Question? Get(int questionId);
+        public IEnumerable<Question> Get(IEnumerable<int> ids);
         public DataResult<Question> Search(DataParameters parameters);
         public int Insert(Question question);
         public void Update(Question question);

@@ -229,7 +229,8 @@
 --GO
 --EXEC sp_rename 'dbo.test_question', 'page_question';
 
---DROP TRIGGER set_test_question_updated_at;  
+--DROP TRIGGER set_test_question_updated_at;
+--GO
 
 --CREATE TRIGGER set_page_question_updated_at ON page_question
 --AFTER UPDATE

@@ -6,7 +6,6 @@ namespace Test_Builder.Services
     {
         private readonly IDBHelper dBHelper;
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly int customer_id;
 
         public QuestionTypeService(IDBHelper dBHelper, IHttpContextAccessor httpContextAccessor)
         {

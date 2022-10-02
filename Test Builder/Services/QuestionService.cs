@@ -43,6 +43,48 @@ namespace Test_Builder.Services
             return question;
         }
 
+        public IEnumerable<Question> Get(IEnumerable<int> ids)
+        {
+            var questionDict = new Dictionary<string, object>() { { "customer_id", customer_id} };
+            var questionIdsParam = new List<string>;
+            foreach (var id in ids)
+            {
+                questionDict["id_" + id] = id;
+                questionIdsParam.Add("id_" + id);
+            }
+            var questions = dBHelper.QueryList2<Question>(
+                $@"SELECT q.id AS Id, q.type_id AS TypeId, q.shuffle AS Shuffle, q.selection AS Selection, 
+                    q.question AS _Question, q.points AS Points, q.penalty AS Penalty,
+                    q.category_id AS Category.Id, c.name AS Category.Name, c.parent_id AS Category.ParentId
+                FROM question q
+                INNER JOIN category c ON c.id = q.category_id AND (c.customer_id = @customer_id OR c.customer_id IS NULL)
+                WHERE q.id IN ({string.Join(',', questionIdsParam)}) AND q.customer_id = @customer_id
+                ORDER BY q.id",
+                questionDict
+            );
+
+            var answers = dBHelper.QueryList2<Answer>(
+                $@"SELECT a.id AS Id, a.answer AS _Answer, a.correct AS Correct, a.match AS Match,
+                    a.points AS Points, a.penalty AS Penalty, a.question_id AS QuestionId
+                FROM answer a
+                WHERE a.question_id IN ({string.Join(',', questionIdsParam)}) AND a.customer_id = @customer_id
+                ORDER BY a.question_id", questionDict
+            );
+
+            var index = 0;
+            foreach (var question in questions)
+            {
+                while (index < answers.Count && answers[index].QuestionId == question.Id)
+                {
+                    if (question.Answers == null)
+                        question.Answers = new List<Answer>();
+                    question.Answers.Add(answers[index++]);
+                }
+            }
+
+            return questions;
+        }
+
         public DataResult<Question> Search(DataParameters parameters)
         {
             var sql =

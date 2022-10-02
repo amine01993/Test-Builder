@@ -45,10 +45,12 @@ namespace Test_Builder.Profiles
 
         void CategoryMapping()
         {
+            MapProperty(s, "Question", "_Question")
             CreateMap<DataRow, Category>()
-                .ForMember(d => d.Id, o => o.MapFrom(s => s["Id"]))
-                .ForMember(d => d.Name, o => o.MapFrom(s => s["Name"]))
-                .ForMember(d => d.ParentId, o => o.MapFrom(s => s["ParentId"] == DBNull.Value ? null : s["ParentId"]))
+                .ForMember(d => d.Id, o => o.MapFrom(s => MapProperty(s, "Category", "Id")))
+                .ForMember(d => d.Name, o => o.MapFrom(s => MapProperty(s, "Category", "Name")))
+                //.ForMember(d => d.ParentId, o => o.MapFrom(s => s["ParentId"] == DBNull.Value ? null : s["ParentId"]))
+                .ForMember(d => d.ParentId, o => o.MapFrom(s => MapProperty(s, "Category", "ParentId")))
                 ;
         }
 
@@ -77,6 +79,7 @@ namespace Test_Builder.Profiles
                 .ForMember(d => d.Shuffle, o => o.MapFrom(s => MapProperty(s, "Question", "Shuffle")))
                 .ForMember(d => d.Selection, o => o.MapFrom(s => MapProperty(s, "Question", "Selection")))
                 .ForMember(d => d._Question, o => o.MapFrom(s => MapProperty(s, "Question", "_Question")))
+                .ForMember(d => d.Category, o => o.MapFrom(s => s))
                 ;
         }
 
@@ -138,6 +141,13 @@ namespace Test_Builder.Profiles
             else if(mapping == "Question")
             {
                 if (name == "PageQuestion")
+                {
+                    propertyFullName = mapping + "." + property;
+                }
+            }
+            else if(mapping == "Category")
+            {
+                if(name == "Question")
                 {
                     propertyFullName = mapping + "." + property;
                 }
