@@ -55,7 +55,7 @@ namespace Test_Builder.Services
             var questions = dBHelper.QueryList2<Question>(
                 $@"SELECT q.id AS Id, q.type_id AS TypeId, q.shuffle AS Shuffle, q.selection AS Selection, 
                     q.question AS _Question, q.points AS Points, q.penalty AS Penalty,
-                    q.category_id AS 'Category.Id', c.name AS 'Category.Name', c.parent_id AS 'Category.ParentId',
+                    q.category_id AS 'Category.Id', c.name AS 'Category.Name', c.parent_id AS 'Category.ParentId'
                 FROM question q
                 INNER JOIN category c ON c.id = q.category_id AND (c.customer_id = @customer_id OR c.customer_id IS NULL)
                 WHERE q.id IN ({string.Join(',', questionIdsParam)}) AND q.customer_id = @customer_id
