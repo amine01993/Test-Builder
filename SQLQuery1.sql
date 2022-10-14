@@ -247,4 +247,5 @@
 --GO
 
 
-
+select Id, Name as 'A.B'
+from test

@@ -37,6 +37,8 @@ import { SettingCreateComponent } from './setting-create/setting-create.componen
 import { PreviewComponent } from './preview/preview.component';
 import { AdminComponent } from './admin/admin.component';
 import { PreviewItemComponent } from './preview/preview-item/preview-item.component';
+import { ImportModalComponent } from './import-modal/import-modal.component';
+import { FileUploadComponent } from './file-upload/file-upload.component';
 
 @NgModule({
   declarations: [
@@ -68,7 +70,9 @@ import { PreviewItemComponent } from './preview/preview-item/preview-item.compon
     SettingCreateComponent,
     PreviewComponent,
     AdminComponent,
-    PreviewItemComponent
+    PreviewItemComponent,
+    ImportModalComponent,
+    FileUploadComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -123,6 +127,8 @@ import { PreviewItemComponent } from './preview/preview-item/preview-item.compon
     LoginComponent,
     RegisterComponent,
     PageSettingsComponent,
+    ImportModalComponent,
+    ConfirmationModalComponent,
     //AppComponent,
   ]
 })

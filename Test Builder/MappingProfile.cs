@@ -45,7 +45,7 @@ namespace Test_Builder.Profiles
 
         void CategoryMapping()
         {
-            MapProperty(s, "Question", "_Question")
+            //MapProperty(s, "Question", "_Question")
             CreateMap<DataRow, Category>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => MapProperty(s, "Category", "Id")))
                 .ForMember(d => d.Name, o => o.MapFrom(s => MapProperty(s, "Category", "Name")))
@@ -72,7 +72,7 @@ namespace Test_Builder.Profiles
             CreateMap<DataRow, Question>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => MapProperty(s, "Question", "Id")))
                 .ForMember(d => d.TypeId, o => o.MapFrom(s => MapProperty(s, "Question", "TypeId")))
-                .ForMember(d => d.QuestionType, o => o.MapFrom(s => s))
+                .ForMember(d => d.QuestionType, o => o.MapFrom(s => s.Table.Columns.Contains("QuestionType.Id") ? s : null))
                 .ForMember(d => d.CategoryId, o => o.MapFrom(s => MapProperty(s, "Question", "CategoryId")))
                 .ForMember(d => d.Points, o => o.MapFrom(s => MapProperty(s, "Question", "Points")))
                 .ForMember(d => d.Penalty, o => o.MapFrom(s => MapProperty(s, "Question", "Penalty")))

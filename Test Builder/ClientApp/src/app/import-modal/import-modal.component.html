@@ -1,0 +1,47 @@
+
+<form [formGroup]="import" #form="ngForm" (ngSubmit)="OnSubmit()" enctype="multipart/form-data">
+  <div class="modal-header">
+    <div class="modal-title">Import</div>
+    <button type="button" class="btn-close" (click)="activeModal.close()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div *ngFor="let error of serverErrors | keyvalue" class="col-12">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ error.key }}
+          <ul>
+            <li *ngFor="let err of error.value">{{ err }}</li>
+          </ul>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <label for="file-to-import" class="form-label">File</label>
+        <!--<input id="file-to-import" class="form-control form-control-sm" type="file"
+         formControlName="file"
+         [class.is-invalid]="(form.submitted || file.touched) && file.errors" />-->
+        <app-file-upload formControlName="file"></app-file-upload>
+
+        <!-- progress bar -->
+        <div *ngIf="uploadProgress > 0" class="progress mt-2">
+          <div class="progress-bar" role="progressbar"
+               style="width: {{ uploadProgress }}%;"
+               attr.aria-valuenow="{{ uploadProgress }}"
+               attr.aria-valuemin="0" attr.aria-valuemax="100">{{ uploadProgress }}%</div>
+        </div>
+
+        <div *ngIf="(form.submitted || file.touched) && file.errors" class="invalid-feedback">
+          <ng-container *ngIf="file.errors.required">
+            This field is required
+          </ng-container>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-sm btn-outline-primary">Submit</button>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeModal.close()">Close</button>
+  </div>
+</form>

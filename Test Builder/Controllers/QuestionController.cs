@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Test_Builder.Services;
 using Test_Builder.Models;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace Test_Builder.Controllers
 {
     [ApiController]
     [Route("api/question")]
-    [Produces("application/json")]
+    //[Produces("application/json")]
     public class QuestionController : ControllerBase
     {
         private readonly IDBHelper dBHelper;
@@ -147,6 +148,50 @@ namespace Test_Builder.Controllers
                 return new JsonResult(null) { StatusCode = 404 };
 
             return new JsonResult(question);
+        }
+
+        // Get: api/question/import-json/1,2,3,
+        [HttpGet("export-json/{ids}")]
+        [Authorize]
+        public IActionResult ExportJson([FromServices] IQuestionService questionService, string ids)
+        {
+            var idList = ids.Split(',').SelectMany(str =>
+            {
+                var list = new List<int>();
+                if (int.TryParse(str, out int result))
+                {
+                    list.Add(result);
+                }
+                return list;
+            });
+
+            var questions = questionService.Get(idList);
+
+            var json = JsonConvert.SerializeObject(questions);
+
+            var fileName = "questions.json";
+
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(json);
+
+            var content = new System.IO.MemoryStream(bytes);
+            return File(content, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
+
+        // Post: api/question/import-json
+        [HttpPost("import-json")]
+        [Authorize]
+        public IActionResult ImportJson(IFormFile importedFile)
+        {
+            var result = new StringBuilder();
+            using (var reader = new StreamReader(importedFile.OpenReadStream()))
+            {
+                while (reader.Peek() >= 0)
+                    result.AppendLine(reader.ReadLine());
+            }
+            var text = result.ToString();
+            var questions = JsonConvert.DeserializeObject<List<Question>>(text);
+
+            return new JsonResult(null);
         }
     }
 }

@@ -31,6 +31,8 @@ export interface Question {
   Selection: number | null;
   _Question: string;
   Answers: Answer[] | null;
+
+  //Selected: boolean = false;
 }
 
 export interface Answer {

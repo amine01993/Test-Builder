@@ -1,5 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationModalComponent } from '../../confirmation-modal/confirmation-modal.component';
@@ -15,11 +16,16 @@ export class QuestionItemComponent implements OnInit {
 
   @Input() question!: Question;
   @Input() key!: number;
+  @Input() selected: boolean = false;
   @Output() reloadDataEvent = new EventEmitter<void>();
+  @Output() selectEvent = new EventEmitter<number>();
+  @Output() unSelectEvent = new EventEmitter<number>();
 
   @Input() duplicating: boolean = false;
   @Input() deleting: boolean = false;
   @Input() usedInLoading: boolean = false;
+
+  selectedControl: FormControl = new FormControl(false);
 
   //@ViewChild(NgbPopover) popover!: NgbPopover;
 
@@ -32,7 +38,15 @@ export class QuestionItemComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(this.question);
+    //console.log(this.question);
+    this.selectedControl.setValue(this.selected);
+    this.selectedControl.valueChanges.subscribe({
+      next: (val) => {
+        console.log('valueChanges', val);
+        if (val) this.selectEvent.emit(this.question.Id);
+        else this.unSelectEvent.emit(this.question.Id);
+      }
+    });
   }
 
   getEditRoute(question: Question): Array<string | number> {
@@ -116,5 +130,9 @@ export class QuestionItemComponent implements OnInit {
         this.usedInLoading = false;
       }
     });
+  }
+
+  ToggleSelection(): void {
+    //if (this.selected.va)
   }
 }

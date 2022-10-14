@@ -117,7 +117,17 @@
         <!-- add a new question -->
         <li><a class="dropdown-item" routerLink="/admin/add-question/0">Add a new question</a></li>
         <!-- import spreadsheet .csv -->
-        <li><a class="dropdown-item" href="#">Import spreadsheet (.CSV)</a></li>
+        <li>
+          <a class="dropdown-item" href="#">Import spreadsheet (.CSV)</a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="#"
+             (click)="ImportQuestionsJson($event)">Import spreadsheet (JSON)</a>
+        </li>
+        <li>
+          <a class="dropdown-item" [class.disabled]="selectedQuestions.length === 0"
+             href="#" (click)="ExportQuestionsJson($event)">Export Selected (JSON)</a>
+        </li>
       </ul>
     </div>
   </div>
@@ -127,6 +137,9 @@
 <!-- search results -->
 <div class="row m-2 mb-5 g-3">
   <div *ngFor="let question of questions; let j = index;" class="col-12 p-0">
-    <app-question-item [question]="question" [key]="j" (reloadDataEvent)="ReloadData()"></app-question-item>
+    <app-question-item [question]="question" [key]="j" [selected]="selectionMap.get(question.Id)!"
+                       (reloadDataEvent)="ReloadData()"
+                       (selectEvent)="SelectQuestion($event)"
+                       (unSelectEvent)="UnSelectQuestion($event)"></app-question-item>
   </div>
 </div>

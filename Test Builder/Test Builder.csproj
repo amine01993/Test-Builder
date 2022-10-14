@@ -37,6 +37,7 @@
     <None Remove="ClientApp\src\app\category\category.model.ts" />
     <None Remove="ClientApp\src\app\category\category.service.ts" />
     <None Remove="ClientApp\src\app\editor.config.ts" />
+    <None Remove="ClientApp\src\app\import-modal\requiredFileType.validator.ts" />
     <None Remove="ClientApp\src\app\pipes\array.pipe.ts" />
     <None Remove="ClientApp\src\app\pipes\object-length.pipe.ts" />
     <None Remove="ClientApp\src\app\pipes\split.pipe.ts" />
@@ -55,6 +56,9 @@
     <TypeScriptCompile Include="ClientApp\src\app\category\category.model.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\category\category.service.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\editor.config.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\import-modal\requiredFileType.validator.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\app\pipes\array.pipe.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>

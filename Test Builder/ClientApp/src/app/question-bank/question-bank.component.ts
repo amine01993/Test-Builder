@@ -3,12 +3,13 @@ import { OnDestroy } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { Category } from '../category/category.model';
 import { CategoryService } from '../category/category.service';
+import { ImportModalComponent } from '../import-modal/import-modal.component';
 import { DataResult, Question, QuestionType } from '../question-add/question.model';
 import { QuestionService } from '../question-add/question.service';
-import { Page } from '../test/test.model';
 
 @Component({
   selector: 'app-question-bank',
@@ -44,10 +45,14 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
     searchTerm: new FormControl(''),
   });
 
+  selectedQuestions: number[] = [];
+  selectionMap: Map<number, boolean> = new Map;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private httpClient: HttpClient,
+    private modal: NgbModal,
     private questionService: QuestionService,
     private categoryService: CategoryService
   ) { }
@@ -114,13 +119,6 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
           this.filter['term'] = '';
         }
 
-        //filterForm: FormGroup = new FormGroup({
-        //  status: new FormControl(0),
-        //  questionType: new FormControl(0),
-        //  category: new FormControl(0),
-        //  subCategory: new FormControl(0),
-        //  searchTerm: new FormControl(''),
-        //});
         this.filterForm.patchValue({
           status: +this.filter['status'],
           questionType: +this.filter['type'],
@@ -128,13 +126,16 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
           //subCategory: +this.filter['subCategory'], // because OnCategoryChange gets triggered
           searchTerm: this.filter['term'],
         });
+        console.log('this.filter', this.filter);
 
-        //this.filterForm.patchValue({
-        //  subCategory: +this.filter['subCategory'],
-        //});
+        let selectedStr = queryParams.hasOwnProperty('selected') ? queryParams['selected'] : '';
+        this.selectedQuestions = selectedStr.split(',').flatMap((t: string) => {
+          let r = [], tmp;
+          if (!isNaN(tmp = parseInt(t))) r.push(tmp);
+          return r;
+        });
+        console.log('this.selectedQuestions', this.selectedQuestions);
 
-
-        console.log('this.filter', this.filter);        
         this.LoadData();
       }
     });
@@ -158,6 +159,10 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
       dict[key] = value;
     }
     return dict;
+  }
+
+  private getSelectedQuestionIds(): string | undefined {
+    return this.selectedQuestions.length > 0 ? this.selectedQuestions.join(',') : undefined;
   }
 
   OnCategoryChange(): void {
@@ -186,6 +191,10 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
       next: data => {
         this.questions = data.Data;
         this.pages = Array(Math.ceil(data.Total / this.pageSize)).fill(0).map((v, i) => i + 1);
+        this.selectionMap.clear();
+        for (const question of this.questions) {
+          this.selectionMap.set(question.Id, this.selectedQuestions.indexOf(question.Id) > -1);
+        }
       }
     });
   }
@@ -195,9 +204,10 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
 
     this.router.navigate(['/admin/question-bank'], {
       queryParams: {
-        _filter: this.encodeParam(this.filter),
+        //_filter: this.encodeParam(this.filter),
         page: this.page,
-        pageSize: this.pageSize
+        //pageSize: this.pageSize,
+        selected: this.getSelectedQuestionIds(),
       }
     });
   }
@@ -205,9 +215,10 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
   OnPreviousPage(): void {
     this.router.navigate(['/admin/question-bank'], {
       queryParams: {
-        _filter: this.encodeParam(this.filter),
+        //_filter: this.encodeParam(this.filter),
         page: this.page - 1,
-        pageSize: this.pageSize
+        //pageSize: this.pageSize,
+        selected: this.getSelectedQuestionIds(),
       }
     });
   }
@@ -215,9 +226,10 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
   OnNextPage(): void {
     this.router.navigate(['/admin/question-bank'], {
       queryParams: {
-        _filter: this.encodeParam(this.filter),
+        //_filter: this.encodeParam(this.filter),
         page: this.page + 1,
-        pageSize: this.pageSize
+        //pageSize: this.pageSize,
+        selected: this.getSelectedQuestionIds(),
       }
     });
   }
@@ -226,15 +238,57 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
     this.pageSize = +this.pageSizeControl.value;
     this.router.navigate(['/admin/question-bank'], {
       queryParams: {
-        _filter: this.encodeParam(this.filter),
+        //_filter: this.encodeParam(this.filter),
         page: 1,
-        pageSize: this.pageSize
+        pageSize: this.pageSize,
+        selected: this.getSelectedQuestionIds(),
       }
     });
   }
 
+  ExportQuestionsJson(event: MouseEvent): void {
+    event.preventDefault();
+    console.log('ExportQuestionsJson', this.selectedQuestions);
+    if (this.selectedQuestions.length === 0)
+      return;
+    this.httpClient.get('api/question/export-json/' + this.getSelectedQuestionIds()!, {
+      params: { auth: true, }
+    }).subscribe({
+      next: (d) => {
+        console.log('success', d);
+        const blob = new Blob([JSON.stringify(d)], { type: 'application/json' });
+        //const url = window.URL.createObjectURL(blob);
+        //window.open(url);
+
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = 'questions.json';
+        // start download
+        a.click();
+      }
+    });
+
+  }
+
+  ImportQuestionsJson(event: MouseEvent): void {
+    event.preventDefault();
+    const confirmationRef = this.modal.open(ImportModalComponent);
+
+    confirmationRef.result.then((ok: number) => {
+
+    }).catch(() => { });;
+  }
+
   ReloadData(): void {
     this.LoadData();
+  }
+
+  SelectQuestion(questionId: number) {
+    this.selectedQuestions.push(questionId);
+  }
+
+  UnSelectQuestion(questionId: number) {
+    this.selectedQuestions = this.selectedQuestions.filter(id => id !== questionId);
   }
 
   OnFilterSubmit(): void {
