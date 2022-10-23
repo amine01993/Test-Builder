@@ -4,20 +4,20 @@ namespace Test_Builder.Services
 {
     public class PageQuestionService : IPageQuestionService
     {
-        private readonly IDBHelper dBHelper;
+        private readonly IDBContext dBContext;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly int customer_id;
 
-        public PageQuestionService(IDBHelper dBHelper, IHttpContextAccessor httpContextAccessor)
+        public PageQuestionService(IDBContext dBContext, IHttpContextAccessor httpContextAccessor)
         {
-            this.dBHelper = dBHelper;
+            this.dBContext = dBContext;
             this.httpContextAccessor = httpContextAccessor;
             customer_id = int.Parse(httpContextAccessor.HttpContext.User.Identity.Name);
         }
 
         public int Insert(PageQuestion pageQuestion)
         {
-            var id = (int) dBHelper.Write(@"
+            var id = (int)dBContext.Write(@"
                 INSERT INTO page_question(page_id, position, random, question_id, 
                     category_id, subcategory_id, type_id, number, question_ids, customer_id)
                 OUTPUT INSERTED.id
@@ -40,8 +40,8 @@ namespace Test_Builder.Services
 
         public int MaxPosition(int pageId)
         {
-            var maxPosition = dBHelper.Query<int>(
-                @"SELECT ISNULL(MAX(position) + 1, 0) AS Nbr
+            var maxPosition = dBContext.GetScalar<int>(
+                @"SELECT ISNULL(MAX(position) + 1, 0)
                 FROM page_question
                 WHERE page_id = @page_id AND customer_id = @customer_id",
                 new Dictionary<string, object>() { { "page_id", pageId }, { "customer_id", customer_id } }
@@ -54,8 +54,8 @@ namespace Test_Builder.Services
         {
             foreach (var position in positions)
             {
-                dBHelper.Write(
-                    @"UPDATE position_question
+                dBContext.Write(
+                    @"UPDATE page_question
                     SET position = @position
                     WHERE id = @id AND customer_id = @customer_id",
                     new Dictionary<string, object> { { "position", position._Position },
@@ -66,7 +66,7 @@ namespace Test_Builder.Services
 
         public void Delete(int id)
         {
-            dBHelper.Write(
+            dBContext.Write(
                 @"DELETE FROM page_question 
                 WHERE id = @id AND customer_id = @customer_id",
                 new Dictionary<string, object>()

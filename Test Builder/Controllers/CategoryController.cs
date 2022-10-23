@@ -10,7 +10,7 @@ namespace Test_Builder.Controllers
     [Produces("application/json")]
     public class CategoryController : ControllerBase
     {
-        public CategoryController(IDBHelper DBHelper)
+        public CategoryController()
         {
         }
 

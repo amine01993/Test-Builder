@@ -247,5 +247,15 @@
 --GO
 
 
-select Id, Name as 'A.B'
-from test
+--select Id, Name as 'A.B'
+--from test
+
+SELECT q.id AS Id, q.type_id AS TypeId, q.shuffle AS Shuffle, q.selection AS Selection, 
+    q.question AS _Question, q.points AS Points, q.penalty AS Penalty,
+    c.id AS 'Category.Id', c.name AS 'Category.Name',
+    cp.id AS 'Category.Parent.Id', cp.name AS 'Category.Parent.Name'
+FROM question q
+INNER JOIN category c ON c.id = q.category_id AND (c.customer_id = 1 OR c.customer_id IS NULL)
+LEFT JOIN category cp ON cp.id = c.parent_id AND (cp.customer_id = 1 OR cp.customer_id IS NULL)
+WHERE q.id IN (1, 2) AND q.customer_id = 1
+ORDER BY q.id

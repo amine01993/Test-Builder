@@ -1,44 +1,45 @@
 ﻿using Test_Builder.Models;
+using Dapper;
 
 namespace Test_Builder.Services
 {
     public class QuestionService : IQuestionService
     {
-        private readonly IDBHelper dBHelper;
+        private readonly IDBContext dBContext;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly int customer_id;
 
-        public QuestionService(IDBHelper dBHelper, IHttpContextAccessor httpContextAccessor)
+        public QuestionService(IDBContext dBContext, IHttpContextAccessor httpContextAccessor)
         {
-            this.dBHelper = dBHelper;
+            this.dBContext = dBContext;
             this.httpContextAccessor = httpContextAccessor;
             customer_id = int.Parse(httpContextAccessor.HttpContext.User.Identity.Name);
         }
 
         public Question? Get(int id)
         {
-            var question = dBHelper.Query2<Question>(
+            var question = dBContext.Get<Question>(
                 @"SELECT type_id AS TypeId, category_id AS CategoryId, points AS Points, penalty AS Penalty, 
                     shuffle AS Shuffle, selection AS Selection, question AS _Question
                 FROM question q
                 WHERE id = @id AND customer_id = @customer_id",
-                new Dictionary<string, object> 
+                 new Dictionary<string, object>
                 { { "id", id }, { "customer_id", customer_id } }
             );
 
             if (question == null)
                 return null;
 
-            var answers = dBHelper.QueryList2<Answer>(
+            var answers = dBContext.List<Answer>(
                 @"SELECT id AS Id, answer AS _Answer, match AS Match, points AS Points, penalty AS Penalty, 
                     correct AS Correct
                 FROM answer a
                 WHERE question_id = @question_id AND customer_id = @customer_id",
-                new Dictionary<string, object> 
+                new Dictionary<string, object>
                 { { "question_id", id }, { "customer_id", customer_id } }
             );
 
-            question.Answers = answers;
+            question.Answers = answers.ToList();
 
             return question;
         }
@@ -52,18 +53,32 @@ namespace Test_Builder.Services
                 questionDict["id_" + id] = id;
                 questionIdsParam.Add("@id_" + id);
             }
-            var questions = dBHelper.QueryList2<Question>(
-                $@"SELECT q.id AS Id, q.type_id AS TypeId, q.shuffle AS Shuffle, q.selection AS Selection, 
-                    q.question AS _Question, q.points AS Points, q.penalty AS Penalty,
-                    q.category_id AS 'Category.Id', c.name AS 'Category.Name', c.parent_id AS 'Category.ParentId'
-                FROM question q
-                INNER JOIN category c ON c.id = q.category_id AND (c.customer_id = @customer_id OR c.customer_id IS NULL)
-                WHERE q.id IN ({string.Join(',', questionIdsParam)}) AND q.customer_id = @customer_id
-                ORDER BY q.id",
-                questionDict, "Question"
-            );
 
-            var answers = dBHelper.QueryList2<Answer>(
+            IEnumerable<Question> questions;
+            using(var connection = dBContext.Connection())
+            {
+                questions = connection.Query<Question, Category, Category, Question>(
+                    $@"SELECT q.id AS Id, q.type_id AS TypeId, q.shuffle AS Shuffle, q.selection AS Selection, 
+                        q.question AS _Question, q.points AS Points, q.penalty AS Penalty,
+                        c.id AS Id, c.name AS Name, c.parent_id AS ParentId,
+                        cp.id AS Id, cp.name AS Name
+                    FROM question q
+                    INNER JOIN category c ON c.id = q.category_id AND (c.customer_id = @customer_id OR c.customer_id IS NULL)
+                    LEFT JOIN category cp ON cp.id = c.parent_id AND (cp.customer_id = @customer_id OR cp.customer_id IS NULL)
+                    WHERE q.id IN ({string.Join(',', questionIdsParam)}) AND q.customer_id = @customer_id
+                    ORDER BY q.id",
+                    (question, category, parent) =>
+                    {
+                        category.Parent = parent;
+                        question.Category = category;
+                        return question;
+                    },
+                    //splitOn: "Category.Id, Category.Parent.Id",
+                    param: questionDict
+                );
+            }
+
+            var answers = dBContext.List<Answer>(
                 $@"SELECT a.id AS Id, a.answer AS _Answer, a.correct AS Correct, a.match AS Match,
                     a.points AS Points, a.penalty AS Penalty, a.question_id AS QuestionId
                 FROM answer a
@@ -74,11 +89,11 @@ namespace Test_Builder.Services
             var index = 0;
             foreach (var question in questions)
             {
-                while (index < answers.Count && answers[index].QuestionId == question.Id)
+                while (index < answers.Count() && answers.ElementAt(index).QuestionId == question.Id)
                 {
                     if (question.Answers == null)
                         question.Answers = new List<Answer>();
-                    question.Answers.Add(answers[index++]);
+                    question.Answers.Add(answers.ElementAt(index++));
                 }
             }
 
@@ -178,13 +193,14 @@ namespace Test_Builder.Services
             //var orderStr = orderList.Count == 0 ? "" : "ORDER BY " + string.Join(", ", orderList);
 
             var totalQuery = $@"SELECT COUNT(*) AS Value FROM ({sql}) as t";
-            var total = dBHelper.Query2<PrimitiveType<int>>(totalQuery, sqlParameters);
+            var total = dBContext.GetScalar<int>(totalQuery, sqlParameters);
 
             var query = $@"{sql} 
                 ORDER BY Id
                 OFFSET {(parameters.page - 1) * parameters.pageSize} ROWS 
                 FETCH NEXT {parameters.pageSize} ROWS ONLY";
-            var list = dBHelper.QueryList2<Question>(query, sqlParameters); // test questions results
+            // questions results
+            var list = dBContext.List<Question>(query, sqlParameters); 
 
             var paramDict = new Dictionary<string, object>
                 { { "customer_id", customer_id } };
@@ -197,7 +213,7 @@ namespace Test_Builder.Services
                 inList.Add("@question_" + index++);
             }
 
-            var answers = dBHelper.QueryList2<Answer>(
+            var answers = dBContext.List<Answer>(
                 $@"SELECT a.id AS Id, a.answer AS _Answer, a.correct AS Correct, a.match AS Match,
                     a.points AS Points, a.penalty AS Penalty, a.question_id AS QuestionId
                 FROM answer a
@@ -208,22 +224,22 @@ namespace Test_Builder.Services
             index = 0;
             foreach (var question in list)
             {
-                while (index < answers.Count && answers[index].QuestionId == question.Id)
+                while (index < answers.Count() && answers.ElementAt(index).QuestionId == question.Id)
                 {
                     if (question.Answers == null)
                         question.Answers = new List<Answer>();
-                    question.Answers.Add(answers[index++]);
+                    question.Answers.Add(answers.ElementAt(index++));
                 }
             }
 
-            var result = new DataResult<Question>() { Total = total.Value, Count = list.Count, Data = list };
+            var result = new DataResult<Question>() { Total = total, Count = list.Count(), Data = list };
 
             return result;
         }
 
         public int Insert(Question question)
         {
-            var questionId = (int) dBHelper.Write(
+            var questionId = (int) dBContext.Write(
                 @"INSERT INTO question(type_id, category_id, points, penalty, shuffle, selection, question, customer_id)
                 OUTPUT INSERTED.id
                 VALUES(@type_id, @category_id, @points, @penalty, @shuffle, @selection, @question, @customer_id)",
@@ -240,7 +256,7 @@ namespace Test_Builder.Services
             {
                 foreach (var answer in question.Answers)
                 {
-                    dBHelper.Write(
+                    dBContext.Write(
                         @"INSERT INTO answer(answer, match, question_id, points, penalty, correct, customer_id)
                             VALUES(@answer, @match, @question_id, @points, @penalty, @correct, @customer_id)",
                         new Dictionary<string, object> { { "answer", answer._Answer },
@@ -259,7 +275,7 @@ namespace Test_Builder.Services
         
         public void Update(Question question)
         {
-            dBHelper.Write(
+            dBContext.Write(
                 @"UPDATE question
                 SET type_id = @type_id, category_id = @category_id, points = @points, penalty = @penalty, 
                     shuffle = @shuffle, selection = @selection, question = @question
@@ -275,7 +291,7 @@ namespace Test_Builder.Services
             );
 
             // deleting all answers and adding the new ones
-            dBHelper.Write(
+            dBContext.Write(
                 @"DELETE FROM answer 
                 WHERE question_id = @question_id AND customer_id = @customer_id",
                 new Dictionary<string, object> 
@@ -286,7 +302,7 @@ namespace Test_Builder.Services
             {
                 foreach (var answer in question.Answers)
                 {
-                    dBHelper.Write(
+                    dBContext.Write(
                         @"INSERT INTO answer(answer, match, question_id, points, penalty, correct, customer_id)
                         VALUES(@answer, @match, @question_id, @points, @penalty, @correct, @customer_id)",
                         new Dictionary<string, object> { { "answer", answer._Answer },
@@ -316,7 +332,7 @@ namespace Test_Builder.Services
         
         public IEnumerable<Test> UsedIn(int id)
         {
-            var tests = dBHelper.QueryList2<Test>(
+            var tests = dBContext.List<Test>(
                 @"SELECT t.id AS Id, t.name AS Name
                 FROM page_question pq
                 INNER JOIN page p ON p.id = pq.page_id AND p.customer_id = @customer_id
@@ -335,14 +351,14 @@ namespace Test_Builder.Services
 
             if(tests.Count() == 0)
             {
-                dBHelper.Write(
+                dBContext.Write(
                     @"DELETE FROM answer 
                     WHERE question_id = @question_id AND customer_id = @customer_id",
                     new Dictionary<string, object>() 
                     { { "question_id", id }, { "customer_id", customer_id } }
                 );
 
-                dBHelper.Write(
+                dBContext.Write(
                     @"DELETE FROM question 
                     WHERE id = @question_id AND customer_id = @customer_id",
                     new Dictionary<string, object>() 

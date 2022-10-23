@@ -11,6 +11,6 @@ namespace Test_Builder.Models
         public string Name { get; set; }
         [BelongToCustomer("category", "id", ErrorMessage = "This Category doesn't exist")]
         public int? ParentId { get; set; }
-        //public Category? Parent { get; set; }
+        public Category? Parent { get; set; }
     }
 }

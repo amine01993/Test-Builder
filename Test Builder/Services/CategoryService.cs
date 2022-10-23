@@ -4,20 +4,20 @@ namespace Test_Builder.Services
 {
     public class CategoryService : ICategoryService
     {
-        private readonly IDBHelper dBHelper;
+        private readonly IDBContext dBContext;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly int customer_id;
 
-        public CategoryService(IDBHelper dBHelper, IHttpContextAccessor httpContextAccessor)
+        public CategoryService(IDBContext dBContext, IHttpContextAccessor httpContextAccessor)
         {
-            this.dBHelper = dBHelper;
+            this.dBContext = dBContext;
             this.httpContextAccessor = httpContextAccessor;
             customer_id = int.Parse(httpContextAccessor.HttpContext.User.Identity.Name);
         }
 
-        public IList<Category> Get()
+        public IEnumerable<Category> Get()
         {
-            var categories = dBHelper.QueryList2<Category>(
+            var categories = dBContext.List<Category>(
                @"SELECT id AS Id, name AS Name, parent_id AS ParentId 
                FROM category
                WHERE customer_id = @customer_id OR customer_id IS NULL",
@@ -29,7 +29,7 @@ namespace Test_Builder.Services
         
         public void Insert(Category category)
         {
-            dBHelper.Write(
+            dBContext.Write(
                 @"INSERT INTO category(name, parent_id, customer_id) 
                 VALUES (@name, @parent_id, @customer_id)",
                 new Dictionary<string, object>()
@@ -41,7 +41,7 @@ namespace Test_Builder.Services
 
         public void Update(Category category)
         {
-            dBHelper.Write(
+            dBContext.Write(
                 @"UPDATE category SET name = @name, parent_id = @parent_id
                 WHERE id = @id AND customer_id = @customer_id",
                 new Dictionary<string, object>()
@@ -67,14 +67,14 @@ namespace Test_Builder.Services
         {
             if (hasSubCategories)
             {
-                dBHelper.Write(
+                dBContext.Write(
                     @"DELETE FROM category WHERE parent_id = @id AND customer_id = @customer_id",
                     new Dictionary<string, object>()
                     { {"id", id}, {"customer_id", customer_id} }
                 );
             }
 
-            dBHelper.Write(
+            dBContext.Write(
                 @"DELETE FROM category WHERE id = @id AND customer_id = @customer_id",
                 new Dictionary<string, object>()
                 { {"id", id}, {"customer_id", customer_id} }

@@ -12,34 +12,20 @@ namespace Test_Builder.Controllers
     [Produces("application/json")]
     public class TokenController : ControllerBase
     {
-        private readonly IDBHelper _DBHelper;
         private readonly ITokenService _token;
 
-        public TokenController(IDBHelper _DBHelper, ITokenService _token)
+        public TokenController(ITokenService _token)
         {
-            this._DBHelper = _DBHelper;
             this._token = _token;
         }
 
         // api/token/register
         [HttpPost("register")]
-        public IActionResult Register([FromBody] Customer customer)
+        public IActionResult Register([FromServices] ICustomerService customerService, [FromBody] Customer customer)
         {
             if (ModelState.IsValid)
             {
-                var query = @"INSERT INTO customer(name, email, password)
-                    OUTPUT INSERTED.id
-                    VALUES(@name, @email, @password)";
-
-                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(customer.Password);
-
-                var parameters = new Dictionary<string, object>();
-                parameters.Add("name", customer.Name);
-                parameters.Add("email", customer.Email);
-                parameters.Add("password", hashedPassword);
-                
-                // return Id
-                var id = _DBHelper.Write(query, parameters);
+                var id = customerService.Insert(customer);
 
                 var token = _token.BuildToken(id.ToString());
 
@@ -56,15 +42,9 @@ namespace Test_Builder.Controllers
 
         // api/token
         [HttpPost]
-        public IActionResult Login([FromBody] Customer customer)
+        public IActionResult Login([FromServices] ICustomerService customerService, [FromBody] Customer customer)
         {
-            string query = $@"SELECT id AS Id, password AS Password
-                FROM customer
-                WHERE email = @email";
-
-            var parameters = new Dictionary<string, object>() { {"email", customer.Email } };
-
-            var res = _DBHelper.Query2<Customer>(query, parameters);
+            var res = customerService.GetByEmail(customer.Email);
 
             if(res != null)
             {
@@ -91,12 +71,9 @@ namespace Test_Builder.Controllers
         // api/token/auth
         [HttpGet("auth")]
         [Authorize]
-        public IActionResult Get()
+        public IActionResult Get([FromServices] ICustomerService customerService)
         {
-            var customer = _DBHelper.Query2<Customer>(
-                @"SELECT name AS Name FROM customer WHERE id = @id",
-                new Dictionary<string, object>() { { "id", User.Identity.Name } }
-            );
+            var customer = customerService.Get(int.Parse(User.Identity.Name));
 
             return new JsonResult(new { name = customer.Name, loggedIn = true });
         }

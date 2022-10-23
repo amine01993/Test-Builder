@@ -4,18 +4,16 @@ namespace Test_Builder.Services
 {
     public class QuestionTypeService : IQuestionTypeService
     {
-        private readonly IDBHelper dBHelper;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IDBContext dBContext;
 
-        public QuestionTypeService(IDBHelper dBHelper, IHttpContextAccessor httpContextAccessor)
+        public QuestionTypeService(IDBContext dBContext)
         {
-            this.dBHelper = dBHelper;
-            this.httpContextAccessor = httpContextAccessor;
+            this.dBContext = dBContext;
         }
 
         public IEnumerable<QuestionType> List()
         {
-            var questionTypes = dBHelper.QueryList2<QuestionType>(
+            var questionTypes = dBContext.List<QuestionType>(
                 @"SELECT id AS Id, name AS Name, icon AS Icon, link AS Link 
                 FROM question_type"
             );

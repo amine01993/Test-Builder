@@ -4,7 +4,7 @@
     {
         public int Total { get; set; }
         public int Count { get; set; }
-        public List<T>? Data { get; set; }
+        public IEnumerable<T>? Data { get; set; }
     }
 
     public class DataParameters

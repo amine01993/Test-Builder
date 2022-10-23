@@ -10,7 +10,7 @@ namespace Test_Builder.Controllers
     [Produces("application/json")]
     public class PageController : ControllerBase
     {
-        public PageController(IDBHelper DBHelper)
+        public PageController()
         {
         }
 

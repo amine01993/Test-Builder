@@ -22,13 +22,13 @@ namespace Test_Builder.Validators
             if (value == null)
                 return ValidationResult.Success;
 
-            var _DBHelper = validationContext.GetService<IDBHelper>();
+            var dBContext = validationContext.GetService<IDBContext>();
             var contextAccessor = validationContext.GetService<IHttpContextAccessor>();
 
             var customer_id = contextAccessor.HttpContext.User.Identity.Name;
 
             int count;
-            count = _DBHelper.Query<int>(
+            count = dBContext.GetScalar<int>(
                 $@"SELECT COUNT(*) 
                 FROM {table} 
                 WHERE {id} = @id AND (customer_id = @customer_id OR customer_id IS NULL)",

@@ -19,10 +19,10 @@ namespace Test_Builder.Validators
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
-            var _DBHelper = validationContext.GetService<IDBHelper>();
+            var dBContext = validationContext.GetService<IDBContext>();
             var query = $@"SELECT COUNT(*) FROM {table} WHERE {columnName} = @param0";
             var param0 = value?.ToString() ?? "";
-            var count = _DBHelper.Query<int>(query, new Dictionary<string, object>() { { "param0", param0 } });
+            var count = dBContext.GetScalar<int>(query, new Dictionary<string, object>() { { "param0", param0 } });
             if (count > 0)
                 return new ValidationResult(GetErrorMessage());
             return ValidationResult.Success;

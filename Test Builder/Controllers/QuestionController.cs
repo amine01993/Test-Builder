@@ -12,11 +12,8 @@ namespace Test_Builder.Controllers
     //[Produces("application/json")]
     public class QuestionController : ControllerBase
     {
-        private readonly IDBHelper dBHelper;
-
-        public QuestionController(IDBHelper dBHelper)
+        public QuestionController()
         {
-            this.dBHelper = dBHelper;
         }
 
         // Get: api/question/types

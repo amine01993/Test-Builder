@@ -18,10 +18,10 @@ namespace Test_Builder.Validators
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
-            var _DBHelper = validationContext.GetService<IDBHelper>();
+            var dBContext = validationContext.GetService<IDBContext>();
 
             int count;
-            count = _DBHelper.Query<int>(
+            count = dBContext.GetScalar<int>(
                 $@"SELECT COUNT(*) 
                 FROM {table} 
                 WHERE {id} = @id",

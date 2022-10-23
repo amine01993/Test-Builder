@@ -32,6 +32,11 @@ namespace Test_Builder.Profiles
                 .ForMember(d => d.Name, o => o.MapFrom(s => s.Table.Columns.Contains("Name") ? s["Name"] : null))
                 .ForMember(d => d.Password, o => o.MapFrom(s => s.Table.Columns.Contains("Password") ? s["Password"] : null))
                 ;
+            //CreateMap<IDataReader, Customer>();
+            //CreateMap<DataRow, Customer>();
+            //CreateMap<IDataRecord, Customer>();
+
+
         }
 
         void QuestionTypeMapping() {
@@ -49,9 +54,18 @@ namespace Test_Builder.Profiles
             CreateMap<DataRow, Category>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => MapProperty(s, "Category", "Id")))
                 .ForMember(d => d.Name, o => o.MapFrom(s => MapProperty(s, "Category", "Name")))
-                //.ForMember(d => d.ParentId, o => o.MapFrom(s => s["ParentId"] == DBNull.Value ? null : s["ParentId"]))
                 .ForMember(d => d.ParentId, o => o.MapFrom(s => MapProperty(s, "Category", "ParentId")))
+                .ForMember(d => d.Parent, o => o.MapFrom(s => MapObject(s, "Category", "Parent")))
                 ;
+
+            //CreateMap<IDataReader, List<Category>>();
+
+            //CreateMap<DataRow, Nullable<Category>>()
+            //    .ForMember(d => d.Id, o => o.MapFrom(s => MapProperty(s, "Category", "Parent.Id")))
+            //    .ForMember(d => d.Name, o => o.MapFrom(s => MapProperty(s, "Category", "Parent.Name")))
+            //    //.ForMember(d => d.ParentId, o => o.MapFrom(s => MapProperty(s, "Category", "ParentId")))
+            //    //.ForMember(d => d.Parent, o => o.MapFrom(s => s.Table.Columns.Contains("QuestionType.Id") ? s : null))
+            //    ;
         }
 
         void AnswerMapping()
@@ -72,7 +86,8 @@ namespace Test_Builder.Profiles
             CreateMap<DataRow, Question>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => MapProperty(s, "Question", "Id")))
                 .ForMember(d => d.TypeId, o => o.MapFrom(s => MapProperty(s, "Question", "TypeId")))
-                .ForMember(d => d.QuestionType, o => o.MapFrom(s => s.Table.Columns.Contains("QuestionType.Id") ? s : null))
+                //.ForMember(d => d.QuestionType, o => o.MapFrom(s => s.Table.Columns.Contains("QuestionType.Id") ? s : null))
+                .ForMember(d => d.QuestionType, o => o.MapFrom(s => MapObject(s, "Question", "QuestionType")))
                 .ForMember(d => d.CategoryId, o => o.MapFrom(s => MapProperty(s, "Question", "CategoryId")))
                 .ForMember(d => d.Points, o => o.MapFrom(s => MapProperty(s, "Question", "Points")))
                 .ForMember(d => d.Penalty, o => o.MapFrom(s => MapProperty(s, "Question", "Penalty")))
@@ -81,6 +96,8 @@ namespace Test_Builder.Profiles
                 .ForMember(d => d._Question, o => o.MapFrom(s => MapProperty(s, "Question", "_Question")))
                 .ForMember(d => d.Category, o => o.MapFrom(s => s))
                 ;
+
+            //CreateMap<IDataReader, List<Question>>();
         }
 
         void TestMapping()
@@ -125,35 +142,75 @@ namespace Test_Builder.Profiles
 
         private object MapProperty(DataRow dr, string mapping, string property)
         {
-            var name = dr.Table.TableName;
+            var tableName = dr.Table.TableName;
             string propertyFullName = property;
-            if(mapping == "QuestionType")
+            if(tableName == "Question")
             {
-                if(name == "Question")
+                if(mapping == "QuestionType")
                 {
                     propertyFullName = mapping + "." + property;
                 }
-                else if(name == "PageQuestion")
+                else if (mapping == "Category")
+                {
+                    propertyFullName = mapping + "." + property;
+                }
+                else if (mapping == "Category.Parent")
+                {
+                    propertyFullName = mapping + "." + property;
+                }
+            }
+            else if(tableName == "PageQuestion")
+            {
+                if (mapping == "QuestionType")
                 {
                     propertyFullName = "Question." + mapping + "." + property;
                 }
-            }
-            else if(mapping == "Question")
-            {
-                if (name == "PageQuestion")
+                else if(mapping == "Question")
                 {
                     propertyFullName = mapping + "." + property;
                 }
             }
-            else if(mapping == "Category")
-            {
-                if(name == "Question")
-                {
-                    propertyFullName = mapping + "." + property;
-                }
-            }
+
             if (dr.Table.Columns.Contains(propertyFullName) && dr[propertyFullName] != DBNull.Value)
                 return dr[propertyFullName];
+            return null;
+        }
+
+        //private object MapProperty(DataRow dr, string mapping, string property)
+        //{
+        //    return MapProperty<object, object>(dr, mapping, property, null);
+        //}
+
+        private object MapObject(DataRow dr, string mapping, string obj)
+        {
+            var tableName = dr.Table.TableName;
+            if(tableName == "Category")
+            {
+                if(mapping == "Category")
+                {
+                    if(dr.Table.Columns.Contains(obj + ".Id"))
+                    {
+                        return dr;
+                    }
+                }
+            }
+            else if (tableName == "Question")
+            {
+                if (mapping == "Category")
+                {
+                    if (dr.Table.Columns.Contains(mapping + "." + obj + ".Id"))
+                    {
+                        return dr;
+                    }
+                }
+                else if (mapping == "QuestionType")
+                {
+                    if (dr.Table.Columns.Contains(mapping + ".Id"))
+                    {
+                        return dr;
+                    }
+                }
+            }
             return null;
         }
     }

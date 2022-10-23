@@ -1,23 +1,24 @@
 ﻿using Test_Builder.Models;
+using Dapper;
 
 namespace Test_Builder.Services
 {
     public class PreviewService: IPreviewService
     {
-        private readonly IDBHelper dBHelper;
+        private readonly IDBContext dBContext;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly int customer_id;
 
-        public PreviewService(IDBHelper dBHelper, IHttpContextAccessor httpContextAccessor)
+        public PreviewService(IDBContext dBContext, IHttpContextAccessor httpContextAccessor)
         {
-            this.dBHelper = dBHelper;
+            this.dBContext = dBContext;
             this.httpContextAccessor = httpContextAccessor;
             customer_id = int.Parse(httpContextAccessor.HttpContext.User.Identity.Name);
         }
 
         public Test Get(int id)
         {
-            var test = dBHelper.Query2<Test>(
+            var test = dBContext.Get<Test>(
                 @"SELECT id AS Id, name AS Name
                 FROM test
                 WHERE id = @id AND customer_id = @customer_id",
@@ -26,7 +27,7 @@ namespace Test_Builder.Services
             if (test == null)
                 return null;
 
-            test.Pages = dBHelper.QueryList2<Page>(
+            test.Pages = dBContext.List<Page>(
                @"SELECT id AS Id, name AS Name, limit AS Limit, position AS Position, 
                         shuffle AS Shuffle, test_id AS TestId
                 FROM page
@@ -45,19 +46,27 @@ namespace Test_Builder.Services
                 pageQuestionDict.Add("page_" + page.Id, page.Id);
             }
 
-            var pageQuestions = dBHelper.QueryList2<PageQuestion>(
-                $@"SELECT pq.id AS Id, pq.position AS Position, tq.random AS Random, tq.question_id AS QuestionId,
-                    tq.question_ids AS QuestionIds, tq.number AS Number,
-                    q.question AS Question._Question, q.selection AS Question.Selection,
-                    qt.id AS Question.TypeId, qt.name AS Question.QuestionType.Name,
-                    pq.page_id AS PageId
-                FROM page_question pq
-                INNER JOIN question q ON q.id = pq.question_id AND q.customer_id = @customer_id
-                INNER JOIN question_type qt ON qt.id = q.type_id
-                WHERE pq.page_id IN ({string.Join(',', pagesIdsParams)}) AND pq.customer_id = @customer_id
-                ORDER BY pq.question_id",
-                pageQuestionDict
-            );
+            IEnumerable<PageQuestion> pageQuestions;
+            using(var connection = dBContext.Connection())
+            {
+                pageQuestions = connection.Query<PageQuestion, Question, QuestionType, PageQuestion>(
+                    $@"SELECT pq.id AS Id, pq.position AS Position, pq.random AS Random, pq.question_id AS QuestionId,
+                        pq.question_ids AS QuestionIds, pq.number AS Number, pq.page_id AS PageId,
+                        q.question AS _Question, q.selection AS Selection,
+                        qt.id AS QuestionType.Id, qt.name AS Name
+                    FROM page_question pq
+                    INNER JOIN question q ON q.id = pq.question_id AND q.customer_id = @customer_id
+                    INNER JOIN question_type qt ON qt.id = q.type_id
+                    WHERE pq.page_id IN ({string.Join(',', pagesIdsParams)}) AND pq.customer_id = @customer_id
+                    ORDER BY pq.question_id",
+                    (pageQuestion, question, questionType) => {
+                        question.QuestionType = questionType;
+                        pageQuestion.Question = question;
+                        return pageQuestion;
+                    },
+                    pageQuestionDict
+                );
+            }
 
             var answerDict = new Dictionary<string, object> { { "customer_id", customer_id } };
             var questionsIdsParams = new List<string>();
@@ -66,7 +75,7 @@ namespace Test_Builder.Services
                 questionsIdsParams.Add("question_" + pageQuestion.QuestionId);
                 answerDict.Add("question_" + pageQuestion.QuestionId, pageQuestion.QuestionId);
             }
-            var answers = dBHelper.QueryList2<Answer>(
+            var answers = dBContext.List<Answer>(
                 $@"SELECT id AS Id, answer AS _Answer, match AS Match, points AS Points, penalty AS Penalty, 
                     correct AS Correct
                 FROM answer a

@@ -9,7 +9,7 @@ using Test_Builder.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+//builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddControllers(options =>
 {
@@ -22,8 +22,10 @@ builder.Services.AddControllers(options =>
 
 
 // Add services to the container.
-builder.Services.AddSingleton<IDBHelper, DBHelper>();
+builder.Services.AddSingleton<IDBContext, DBContext>();
+//builder.Services.AddSingleton<IDBHelper, DBHelper>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
+builder.Services.AddSingleton<ICustomerService, CustomerService>();
 builder.Services.AddSingleton<IQuestionService, QuestionService>();
 builder.Services.AddSingleton<IQuestionTypeService, QuestionTypeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();

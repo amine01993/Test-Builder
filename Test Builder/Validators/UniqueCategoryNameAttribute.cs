@@ -13,7 +13,7 @@ namespace Test_Builder.Validators
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
-            var _DBHelper = validationContext.GetService<IDBHelper>();
+            var dBContext = validationContext.GetService<IDBContext>();
             var contextAccessor = validationContext.GetService<IHttpContextAccessor>();
             var category = (Category) validationContext.ObjectInstance;
 
@@ -23,7 +23,7 @@ namespace Test_Builder.Validators
             // IF Subcategory
             if (category.ParentId.HasValue)
             {
-                count = _DBHelper.Query<int>(
+                count = dBContext.GetScalar<int>(
                     @"SELECT COUNT(*) 
                     FROM category 
                     WHERE name = @name AND parent_id = @parent_id 
@@ -34,7 +34,7 @@ namespace Test_Builder.Validators
             }
             else
             {   // IF Category
-                count = _DBHelper.Query<int>(
+                count = dBContext.GetScalar<int>(
                     @"SELECT COUNT(*) 
                     FROM category 
                     WHERE name = @name AND parent_id IS NULL 
