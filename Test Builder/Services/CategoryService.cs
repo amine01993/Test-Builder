@@ -27,16 +27,18 @@ namespace Test_Builder.Services
             return categories;
         }
         
-        public void Insert(Category category)
+        public int Insert(Category category)
         {
-            dBContext.Write(
+            var id = dBContext.Write(
                 @"INSERT INTO category(name, parent_id, customer_id) 
+                OUTPUT INSERTED.id
                 VALUES (@name, @parent_id, @customer_id)",
                 new Dictionary<string, object>()
                 { {"name", category.Name},
                     {"parent_id", category.ParentId.HasValue ? category.ParentId : DBNull.Value},
                     {"customer_id", customer_id} }
             );
+            return (int)id;
         }
 
         public void Update(Category category)
@@ -79,6 +81,33 @@ namespace Test_Builder.Services
                 new Dictionary<string, object>()
                 { {"id", id}, {"customer_id", customer_id} }
             );
+        }
+
+        public Category? Get(Category category)
+        {
+            Category? _category;
+            if(category.Parent == null)
+            {
+                _category = dBContext.Get<Category>(
+                   @"SELECT id AS Id 
+                   FROM category 
+                   WHERE (customer_id = @customer_id OR customer_id IS NULL) AND name = @name AND parent_id IS NULL",
+                   new Dictionary<string, object>()
+                   { {"customer_id", customer_id}, {"name", category.Name} }
+                );
+            }
+            else
+            {
+                _category = dBContext.Get<Category>(
+                   @"SELECT id AS Id
+                   FROM category
+                   WHERE (customer_id = @customer_id OR customer_id IS NULL) AND name = @name AND parent_id = @parent_id",
+                   new Dictionary<string, object>()
+                   { {"customer_id", customer_id}, {"name", category.Name}, {"parent_id", category.ParentId.Value} }
+                );
+            }
+            
+            return _category;
         }
 
     }

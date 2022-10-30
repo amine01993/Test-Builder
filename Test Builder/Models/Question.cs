@@ -11,7 +11,7 @@ namespace Test_Builder.Models
         [BelongToCustomer("category", "id", ErrorMessage = "This Category doesn't exist")]
         public QuestionType? QuestionType { get; set; }
         public int CategoryId { get; set; }
-        public Category Category { get; set; }
+        public Category? Category { get; set; }
         [GreaterThan(0)]
         [GreaterThanOrEqualToProperty("Penalty")]
         public double Points { get; set; }

@@ -35,6 +35,7 @@ export interface Question {
 }
 
 export interface QuestionType {
+  Id: number;
   Name: string;
 }
 

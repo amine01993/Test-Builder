@@ -14,7 +14,7 @@ namespace Test_Builder.Models
         public int Position { get; set; }
         [BelongToCustomer("test", "id", ErrorMessage = "This Test doesn't exist")]
         public int TestId { get; set; }
-        public IList<PageQuestion> PageQuestions { get; set; }
+        public IList<PageQuestion>? PageQuestions { get; set; }
     }
 
     public class Position

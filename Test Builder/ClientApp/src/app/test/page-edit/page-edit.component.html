@@ -48,7 +48,8 @@
 </div>
 
 <form [formGroup]="pageForm">
-  <div class="row page-drop-boundary m-2 mb-5 g-3" cdkDropList (cdkDropListDropped)="drop($event)" formArrayName="positions">
+  <div *ngIf="page"
+       class="row page-drop-boundary m-2 mb-5 g-3" cdkDropList (cdkDropListDropped)="drop($event)" formArrayName="positions">
     <div *ngFor="let pageQuestion of page!.PageQuestions; let j = index;" class="col-12 p-0"
          cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".page-drop-boundary">
       <div class="row g-3 shadow-sm">
@@ -65,7 +66,7 @@
                    [class.correct]="answer.Correct">
                 <!-- display answers + highlight right answers -->
                 <!-- Multiple choice -->
-                <ng-container *ngIf="pageQuestion.Question!.TypeId === 1">
+                <ng-container *ngIf="pageQuestion.Question!.QuestionType!.Id === 1">
                   <div class="form-check">
                     <input [type]="pageQuestion.Question!.Selection ? 'checkbox' : 'radio'"
                            class="form-check-input" [id]="'answer' + j + '-' + i" [name]="'answer' + j" />
@@ -73,7 +74,7 @@
                   </div>
                 </ng-container>
                 <!-- True False -->
-                <ng-container *ngIf="pageQuestion.Question!.TypeId === 2">
+                <ng-container *ngIf="pageQuestion.Question!.QuestionType!.Id === 2">
                   <div class="form-check">
                     <input type="radio"
                            class="form-check-input" [id]="'answer' + j + '-' + i" [name]="'answer' + j" />
@@ -81,7 +82,7 @@
                   </div>
                 </ng-container>
                 <!-- Matching -->
-                <ng-container *ngIf="pageQuestion.Question!.TypeId === 3">
+                <ng-container *ngIf="pageQuestion.Question!.QuestionType!.Id === 3">
                   <div class="row">
                     <div class="col-5" [innerHTML]="answer._Answer"></div>
                     <div class="col-2">
@@ -91,11 +92,11 @@
                   </div>
                 </ng-container>
                 <!-- Free Text -->
-                <ng-container *ngIf="pageQuestion.Question!.TypeId === 4">
+                <ng-container *ngIf="pageQuestion.Question!.QuestionType!.Id === 4">
                   <span [innerHTML]="answer._Answer"></span>
                 </ng-container>
                 <!-- Essay -->
-                <ng-container *ngIf="pageQuestion.Question!.TypeId === 5">
+                <ng-container *ngIf="pageQuestion.Question!.QuestionType!.Id === 5">
                 </ng-container>
               </div>
             </ng-container>

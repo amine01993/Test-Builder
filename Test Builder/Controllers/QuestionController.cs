@@ -177,7 +177,7 @@ namespace Test_Builder.Controllers
         // Post: api/question/import-json
         [HttpPost("import-json")]
         [Authorize]
-        public IActionResult ImportJson(IFormFile importedFile)
+        public IActionResult ImportJson([FromServices] IQuestionService questionService, IFormFile importedFile)
         {
             var result = new StringBuilder();
             using (var reader = new StreamReader(importedFile.OpenReadStream()))
@@ -187,6 +187,8 @@ namespace Test_Builder.Controllers
             }
             var text = result.ToString();
             var questions = JsonConvert.DeserializeObject<List<Question>>(text);
+
+            questionService.Import(questions);
 
             return new JsonResult(null);
         }

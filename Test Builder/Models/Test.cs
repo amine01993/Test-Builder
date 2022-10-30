@@ -15,7 +15,7 @@ namespace Test_Builder.Models
         [BelongToCustomer("category", "id", ErrorMessage = "This Category doesn't exist")]
         public int CategoryId { get; set; }
         //public int? Limit { get; set; }
-        public IEnumerable<Page> Pages { get; set; }
+        public IEnumerable<Page>? Pages { get; set; }
     }
 
     public class UsedInTestConverter : JsonConverter<Test>

@@ -42,6 +42,7 @@ export class PageEditComponent implements OnInit {
           .subscribe({
             next: page => {
               this.page = page;
+              console.log('this.page', this.page);
               //this.testQuestions = data.questions;
               for (const pq of this.page.PageQuestions) {
                 this.positions.controls.push(new FormControl(pq.Position));

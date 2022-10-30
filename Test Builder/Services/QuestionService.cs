@@ -7,13 +7,15 @@ namespace Test_Builder.Services
     {
         private readonly IDBContext dBContext;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly ICategoryService categoryService;
         private readonly int customer_id;
 
-        public QuestionService(IDBContext dBContext, IHttpContextAccessor httpContextAccessor)
+        public QuestionService(IDBContext dBContext, IHttpContextAccessor httpContextAccessor, ICategoryService categoryService)
         {
             this.dBContext = dBContext;
             this.httpContextAccessor = httpContextAccessor;
             customer_id = int.Parse(httpContextAccessor.HttpContext.User.Identity.Name);
+            this.categoryService = categoryService;
         }
 
         public Question? Get(int id)
@@ -371,5 +373,56 @@ namespace Test_Builder.Services
             return 1;
         }
 
+        public void Import(IEnumerable<Question> questions)
+        {
+            var categoryIdMap = new Dictionary<int, int>();
+            foreach (var question in questions)
+            {
+                // set correct category id and parent id
+                if (categoryIdMap.ContainsKey(question.Category.ParentId.Value))
+                {
+                    question.Category.ParentId = categoryIdMap[question.Category.ParentId.Value];
+                }
+                else
+                {
+                    var parent = categoryService.Get(question.Category.Parent);
+                    int parentId;
+                    if(parent == null)
+                    {
+                        parentId = categoryService.Insert(question.Category.Parent);
+                    }
+                    else
+                    {
+                        parentId = parent.Id;
+                    }
+                    categoryIdMap.Add(question.Category.ParentId.Value, parentId);
+                    question.Category.ParentId = parentId;
+                }
+
+                if (categoryIdMap.ContainsKey(question.Category.Id))
+                {
+                    question.Category.Id = categoryIdMap[question.Category.Id];
+                }
+                else
+                {
+                    var category = categoryService.Get(question.Category);
+                    int categoryId;
+                    if (category == null)
+                    {
+                        categoryId = categoryService.Insert(question.Category);
+                    }
+                    else
+                    {
+                        categoryId = category.Id;
+                    }
+                    categoryIdMap.Add(question.Category.Id, categoryId);
+                    question.Category.Id = categoryId;
+                }
+
+                // add question
+                question.CategoryId = question.Category.Id;
+                Insert(question);
+            }
+        }
     }
 }

@@ -14,5 +14,6 @@ namespace Test_Builder.Services
         public int? Duplicate(int questionId);
         public IEnumerable<Test> UsedIn(int questionId);
         public int Delete(int questionId);
+        public void Import(IEnumerable<Question> questions);
     }
 }
