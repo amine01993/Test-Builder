@@ -42,7 +42,7 @@ namespace Test_Builder.Services
             var pagesIdsParams = new List<string>();
             foreach(var page in test.Pages)
             {
-                pagesIdsParams.Add("page_" + page.Id);
+                pagesIdsParams.Add("@page_" + page.Id);
                 pageQuestionDict.Add("page_" + page.Id, page.Id);
             }
 
@@ -53,7 +53,7 @@ namespace Test_Builder.Services
                     $@"SELECT pq.id AS Id, pq.position AS Position, pq.random AS Random, pq.question_id AS QuestionId,
                         pq.question_ids AS QuestionIds, pq.number AS Number, pq.page_id AS PageId,
                         q.question AS _Question, q.selection AS Selection,
-                        qt.id AS QuestionType.Id, qt.name AS Name
+                        qt.id AS Id, qt.name AS Name
                     FROM page_question pq
                     INNER JOIN question q ON q.id = pq.question_id AND q.customer_id = @customer_id
                     INNER JOIN question_type qt ON qt.id = q.type_id
@@ -64,7 +64,8 @@ namespace Test_Builder.Services
                         pageQuestion.Question = question;
                         return pageQuestion;
                     },
-                    pageQuestionDict
+                    splitOn: "_Question,Id",
+                    param: pageQuestionDict
                 );
             }
 
@@ -72,7 +73,7 @@ namespace Test_Builder.Services
             var questionsIdsParams = new List<string>();
             foreach (var pageQuestion in pageQuestions)
             {
-                questionsIdsParams.Add("question_" + pageQuestion.QuestionId);
+                questionsIdsParams.Add("@question_" + pageQuestion.QuestionId);
                 answerDict.Add("question_" + pageQuestion.QuestionId, pageQuestion.QuestionId);
             }
             var answers = dBContext.List<Answer>(

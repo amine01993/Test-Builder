@@ -81,33 +81,35 @@ import { FileUploadComponent } from './file-upload/file-upload.component';
     ReactiveFormsModule,
     RouterModule.forRoot([
       { path: '', pathMatch: 'full', redirectTo: 'admin' },
-      { path: 'admin', component: HomeComponent, pathMatch: 'full' },
-      //{ path: 'counter', component: CounterComponent },
       {
-        path: 'admin/add-question/:page-id', component: QuestionAddComponent,
+        path: 'admin', component: AdminComponent,
         children: [
-          { path: '', pathMatch: 'full', redirectTo: 'multiple-choice' },
-          { path: 'multiple-choice/:id', component: MultipleChoiceAddComponent },
-          { path: 'multiple-choice', component: MultipleChoiceAddComponent },
-          { path: 'true-false/:id', component: TrueFalseAddComponent },
-          { path: 'true-false', component: TrueFalseAddComponent },
-          { path: 'matching/:id', component: MatchingAddComponent },
-          { path: 'matching', component: MatchingAddComponent },
-          { path: 'free-text/:id', component: FreeTextAddComponent },
-          { path: 'free-text', component: FreeTextAddComponent },
-          { path: 'essay/:id', component: EssayAddComponent },
-          { path: 'essay', component: EssayAddComponent }
+          { path: '', component: HomeComponent, pathMatch: 'full' },
+          {
+            path: 'add-question/:page-id', component: QuestionAddComponent,
+            children: [
+              { path: '', pathMatch: 'full', redirectTo: 'multiple-choice' },
+              { path: 'multiple-choice/:id', component: MultipleChoiceAddComponent },
+              { path: 'multiple-choice', component: MultipleChoiceAddComponent },
+              { path: 'true-false/:id', component: TrueFalseAddComponent },
+              { path: 'true-false', component: TrueFalseAddComponent },
+              { path: 'matching/:id', component: MatchingAddComponent },
+              { path: 'matching', component: MatchingAddComponent },
+              { path: 'free-text/:id', component: FreeTextAddComponent },
+              { path: 'free-text', component: FreeTextAddComponent },
+              { path: 'essay/:id', component: EssayAddComponent },
+              { path: 'essay', component: EssayAddComponent }
+            ]
+          },
+          { path: 'category', component: CategoryComponent },
+          { path: 'test-add', component: TestAddComponent },
+          { path: 'test-edit/:id', component: TestEditComponent },
+          { path: 'page-edit/:page-id', component: PageEditComponent },
+          { path: 'question-bank/:page-id', component: QuestionBankComponent },
+          { path: 'question-bank', component: QuestionBankComponent },
+          { path: 'setting-create', component: SettingCreateComponent },
         ]
-      },
-      { path: 'admin/category', component: CategoryComponent },
-      { path: 'admin/test-add', component: TestAddComponent },
-      { path: 'admin/test-edit/:id', component: TestEditComponent },
-      { path: 'admin/page-edit/:page-id', component: PageEditComponent },
-      { path: 'admin/question-bank/:page-id', component: QuestionBankComponent },
-      { path: 'admin/question-bank', component: QuestionBankComponent },
-      { path: 'admin/setting-create', component: SettingCreateComponent },
-
-      { path: 'preview/test/:id', component: PreviewComponent }
+      },      { path: 'preview/test/:id', component: PreviewComponent }
     ]),
     AngularEditorModule,
     NgbModalModule,

@@ -76,7 +76,6 @@ export class MatchingAddComponent implements OnInit, OnDestroy {
 
     this.route.params.subscribe({
       next: params => {
-        //console.log('params', params, +params['id']);
         if (+params['id']) {
           this.questionId = +params['id'];
           if (this.questionId > 0) {

@@ -1,8 +1,3 @@
 <body>
-  <ng-container *ngIf="layout === 'admin'">
-    <app-admin></app-admin>
-  </ng-container>
-  <ng-container *ngIf="layout === 'preview'">
-    <app-preview></app-preview>
-  </ng-container>
+  <router-outlet></router-outlet>
 </body>

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import LayoutService from '../layout.service';
 
 @Component({
   selector: 'app-admin',
@@ -9,11 +8,9 @@ import LayoutService from '../layout.service';
 export class AdminComponent implements OnInit {
 
   constructor(
-    private layoutService: LayoutService,
   ) { }
 
   ngOnInit(): void {
-    this.layoutService.setLayout('admin');
   }
 
 }

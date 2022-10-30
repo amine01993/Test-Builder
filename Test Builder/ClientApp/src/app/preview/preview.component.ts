@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import LayoutService from '../layout.service';
 import { Test } from '../test/test.model';
 
 @Component({
@@ -19,19 +18,17 @@ export class PreviewComponent implements OnInit {
   remainingTime: number|null = 0;
 
   constructor(
-    private layoutService: LayoutService,
     private httpClient: HttpClient,
     private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
-    this.layoutService.setLayout('preview');
-
     this.route.params.subscribe({
       next: params => {
         const testId = +params['id'];
+        console.log('testId', params);
 
-        this.httpClient.get<Test>('api/preview/' + testId).subscribe({
+        this.httpClient.get<Test>('api/preview/' + testId, { params: { auth: true } }).subscribe({
           next: test => {
             console.log('Test', test);
             this.test = test;
