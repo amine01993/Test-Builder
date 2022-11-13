@@ -1,6 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Question } from '../../question-add/question.model';
-import { Test } from '../../test/test.model';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { PageQuestion } from '../../test/test.model';
 
 @Component({
   selector: 'app-preview-item',
@@ -9,43 +8,33 @@ import { Test } from '../../test/test.model';
 })
 export class PreviewItemComponent implements OnInit {
 
-  @Input() question!: Question;
+  @Input() pageQuestion!: PageQuestion;
   @Input() key!: number;
 
-  @Input() duplicating: boolean = false;
-  @Input() deleting: boolean = false;
-  @Input() usedInLoading: boolean = false;
-
-  tests: Test[] = [];
+  private selectedAnswers: any[] = [];
+  @Output() answersEvent: EventEmitter<{ questionId: number, answers: any[] }> = new EventEmitter;
 
   constructor() { }
 
   ngOnInit(): void {
+
   }
 
-  getEditRoute(question: Question): Array<string | number> {
-    switch (question.TypeId) {
-      case 1:
-        return ['/admin', 'add-question', 0, 'multiple-choice', question.Id!];
-      case 2:
-        return ['/admin', 'add-question', 0, 'true-false', question.Id!];
-      case 3:
-        return ['/admin', 'add-question', 0, 'matching', question.Id!];
-      case 4:
-        return ['/admin', 'add-question', 0, 'free-text', question.Id!];
-      case 5:
-        return ['/admin', 'add-question', 0, 'essay', question.Id!];
+  onCheckChange(event: any) {
+    if (this.pageQuestion.Question?.TypeId === 1) {
+      if (this.pageQuestion.Question!.Selection) { // checkbox
+        if (event.target.checked) {
+          this.selectedAnswers.push(event.target.value);
+        }
+        else {
+          const index = this.selectedAnswers.indexOf(event.target.value);
+          if (index > -1) this.selectedAnswers.splice(index, 1);
+        }
+      }
+      else { // radio
+        this.selectedAnswers = [event.target.value];
+      }
+      this.answersEvent.emit({ questionId: this.pageQuestion.QuestionId!, answers: this.selectedAnswers });
     }
-    return [];
-  }
-
-  OnDuplicateQuestion(question: Question): void {
-  }
-
-  OnDeleteQuestion(question: Question): void {
-  }
-
-  OnUsedIn(question: Question, p: any): void {
-    //console.log(this.popover);
   }
 }

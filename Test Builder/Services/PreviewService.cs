@@ -61,6 +61,7 @@ namespace Test_Builder.Services
                     ORDER BY pq.question_id",
                     (pageQuestion, question, questionType) => {
                         question.QuestionType = questionType;
+                        question.TypeId = questionType.Id;
                         pageQuestion.Question = question;
                         return pageQuestion;
                     },
@@ -78,7 +79,7 @@ namespace Test_Builder.Services
             }
             var answers = dBContext.List<Answer>(
                 $@"SELECT id AS Id, answer AS _Answer, match AS Match, points AS Points, penalty AS Penalty, 
-                    correct AS Correct
+                    question_id AS QuestionId, correct AS Correct
                 FROM answer a
                 WHERE question_id IN ({string.Join(',', questionsIdsParams)}) AND customer_id = @customer_id
                 ORDER BY question_id",
@@ -86,10 +87,10 @@ namespace Test_Builder.Services
             );
 
             AttachAnswersToPageQuestions(answers, pageQuestions);
-
-            pageQuestions.OrderBy(pq => pq.PageId);
+            pageQuestions = pageQuestions.OrderBy(pq => pq.PageId);
 
             AttachPageQuestionsToPages(pageQuestions, test.Pages);
+            test.Pages = test.Pages.OrderBy(p => p.Position);
 
             return test;
         }
@@ -128,9 +129,8 @@ namespace Test_Builder.Services
                     page.PageQuestions.Add(pageQuestions.ElementAt(pqi++));
                 }
                 if (page.PageQuestions != null)
-                    page.PageQuestions.OrderBy(pq => pq.Position);
+                    page.PageQuestions = page.PageQuestions.OrderBy(pq => pq.Position).ToList();
             }
-            pages.OrderBy(p => p.Position);
         }
     }
 }

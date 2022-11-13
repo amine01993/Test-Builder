@@ -1,44 +1,44 @@
 <div *ngIf="test" class="row">
   <div class="col-3">
-    <div class="row">
+    <div class="row p-2 border-bottom border-info">
       <div class="col-6">
         Test Index
       </div>
-      <div class="col-6">
+      <div class="col-6 text-end">
         <i class="bi bi-arrow-bar-left"></i>
       </div>
     </div>
-    <hr />
 
-    <div class="row">
-      <div class="col-6">
+    <div class="row p-2 border-bottom border-info">
+      <div class="col-6 pb-2">
         <i class="bi bi-folder2-open"></i>
         Pages
       </div>
-      <div class="col-6">
+      <div class="col-6 pb-2">
         <i class="bi bi-chevron-up"></i>
       </div>
 
-      <div class="col-12">
-        <ng-container *ngFor="let page of test.Pages">
-          <div class="col-6">
-            <i class="bi bi-file-earmark-text-fill"></i>
-            {{ page.Name }}
-          </div>
-          <div class="col-6">
-            <span class="badge rounded-pill bg-light text-dark">
-              <i class="bi bi-info-circle-fill"></i>
-              0 / {{ page.PageQuestions.length }}
-            </span>
+      <div class="col-12 ps-4">
+        <ng-container *ngFor="let page of test.Pages; let i = index">
+          <div class="d-flex justify-content-between pb-2">
+            <div class="">
+              <i class="bi bi-file-earmark-text-fill"></i>
+              {{ page.Name }}
+            </div>
+            <div class="">
+              <span class="badge rounded-pill bg-light text-dark">
+                <i class="bi bi-info-circle-fill"></i>
+                {{ answered[i] }} / {{ page.PageQuestions.length }}
+              </span>
+            </div>
           </div>
         </ng-container>
       </div>
     </div>
-    <hr />
 
-    <div class="row">
+    <div class="row p-2 border-bottom border-info g-2">
       <div class="col-12">
-        Answered: {{ answered }} / {{ totalQuestions }}
+        Answered: {{ totalAnswered }} / {{ totalQuestions }}
       </div>
       <div class="col-12">
         Progress: {{ progress }}%
@@ -50,56 +50,58 @@
         </div>
       </div>
     </div>
-    <hr />
 
-    <div class="row">
-      <div class="col-12">
+    <div class="row p-2 border-bottom border-info g-2 p-2">
+      <div class="col-12 d-grid">
         <button type="button" class="btn btn-outline-primary">
           <i class="bi bi-gear-fill"></i>
           Settings
         </button>
       </div>
-      <div class="col-12">
+      <div class="col-12 d-grid">
         <button type="button" class="btn btn-outline-success">
           <i class="bi bi-sd-card-fill"></i>
           Save
         </button>
       </div>
-      <div class="col-12">
+      <div class="col-12 d-grid">
         <button type="button" class="btn btn-outline-dark">
           <i class="bi bi-arrow-bar-right"></i>
           Finish test
         </button>
       </div>
     </div>
-    <hr />
 
-    <div class="row">
-      <button type="button" class="btn btn-link">
-        <i class="bi bi-x"></i>
-        Close
-      </button>
+    <div class="row p-2">
+      <div class="col-12 d-grid">
+        <button type="button" class="btn btn-secondary">
+          <i class="bi bi-x"></i>
+          Close
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Test -->
   <div class="col-9">
-    <div class="row">
-      <div class="col-12">
+    <div class="row g-2">
+      <div class="col-12 p-2 bg-primary">
         <!-- test name -->
         {{ test.Name }}
       </div>
 
-      <div class="col-1">
+      <div class="col-1 p-2" *ngIf="!showTestSummary">
         <i class="bi bi-arrow-return-right"></i>
       </div>
-      <div class="col-11">
+      <div class="col-11 p-2 bg-info" *ngIf="!showTestSummary">
         <div class="row">
           <div class="col-6">
-            Page {{ currentPageIndex + 1 }} / {{ test.Pages.length }}: {{ test.Pages[currentPageIndex] }}
+            Page {{ currentPageIndex + 1 }} / {{ test.Pages.length }}: {{ test.Pages[currentPageIndex].Name }}
           </div>
           <div class="col-3">
-            <i class="bi bi-clock-fill"></i> Remaining Time for Page
+            <ng-container *ngIf="remainingTime">
+              <i class="bi bi-clock-fill"></i> Remaining Time for Page
+            </ng-container>
           </div>
           <div class="col-3">
             <!--1 minute, 29 seconds-->
@@ -110,8 +112,42 @@
         </div>
       </div>
 
-      <div class="col-12">
+      <div class="col-12 text-center pe-4 pt-2" *ngIf="showTestSummary">
+        <!-- test summary -->
+        <h3 class="m-5">
+          <i class="bi bi-flag-fill"></i> Test Summary
+        </h3>
+        <div class="d-flex justify-content-center">
+          <div class="text-white bg-success p-2 m-2 rounded-pill">
+            Correct: {{ summary.correct }}
+          </div>
+          <div class="text-white bg-danger p-2 m-2 rounded-pill">
+            Uncorrect: {{ summary.unCorrect }}
+          </div>
+          <div class="text-white bg-secondary p-2 m-2 rounded-pill">
+            Unanswered: {{ summary.unAnswered }}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" *ngIf="!showTestSummary">
         <!-- display questions -->
+        <ng-container *ngFor="let pq of test.Pages[currentPageIndex].PageQuestions; let i = index">
+          <app-preview-item [pageQuestion]="pq" [key]="i" (answersEvent)="UpdateAnswers($event)"></app-preview-item>
+        </ng-container>
+      </div>
+
+      <div class="col-12 text-end pe-4 pt-2" *ngIf="!showTestSummary">
+        <!-- prev + next + finish test -->
+        <button class="btn btn-outline-secondary me-2 disabled" (click)="OnPrevious()">
+          Previous
+        </button>
+        <button class="btn btn-outline-secondary me-2" (click)="OnNext()">
+          Next
+        </button>
+        <button class="btn btn-outline-primary" (click)="OnSubmit()">
+          Finish Test
+        </button>
       </div>
     </div>
   </div>
