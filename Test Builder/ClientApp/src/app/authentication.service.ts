@@ -9,6 +9,7 @@ import { AuthenticationData } from "./authentication.model";
 export class AuthenticationService {
 
   subject: Subject<AuthenticationData> = new Subject();
+  authModalOpen: boolean = false;
 
   constructor(private httpClient: HttpClient) { }
 
@@ -30,8 +31,8 @@ export class AuthenticationService {
   }
 
   updateHeader() {
-    if (this.isAuth()) {
-      this.subject.next({ loggedIn: true, name: '' });
+    //if (this.isAuth()) {
+    //  this.subject.next({ loggedIn: true, name: '' });
 
       this.httpClient.get<AuthenticationData>('api/token/auth', {
         params: { auth: true }
@@ -42,13 +43,13 @@ export class AuthenticationService {
         },
         error: (err) => {
           //console.error(err);
-          if (err.status === 401) { // Unauthorized
-            this.removeToken();
-          }
-          this.subject.next({ loggedIn: false, name: '' });
+          //if (err.status === 401) { // Unauthorized
+          //  this.removeToken();
+          //}
+          //this.subject.next({ loggedIn: false, name: '' });
         }
       });
-    }
+    //}
 
   }
 }

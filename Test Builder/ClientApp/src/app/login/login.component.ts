@@ -34,8 +34,9 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('LoginComponent OnInit');
+    //this.activeModal.
   }
-
+  
   RemoveError(key: string): void {
     if (this.serverErrors.hasOwnProperty(key)) {
       delete this.serverErrors[key];
@@ -56,7 +57,7 @@ export class LoginComponent implements OnInit {
             this.authService.setToken(data.token);
             this.authService.updateHeader();
             this.serverErrors = {};
-            this.activeModal.close();
+            this.activeModal.close(1);
           }
           else {
             this.serverErrors = data.errors;
