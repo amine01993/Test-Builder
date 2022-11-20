@@ -39,6 +39,7 @@
     <None Remove="ClientApp\src\app\category\category.service.ts" />
     <None Remove="ClientApp\src\app\editor.config.ts" />
     <None Remove="ClientApp\src\app\import-modal\requiredFileType.validator.ts" />
+    <None Remove="ClientApp\src\app\modal.service.ts" />
     <None Remove="ClientApp\src\app\pipes\array.pipe.ts" />
     <None Remove="ClientApp\src\app\pipes\object-length.pipe.ts" />
     <None Remove="ClientApp\src\app\pipes\split.pipe.ts" />
@@ -51,6 +52,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\modal.service.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\authentication.interceptor.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\authentication.model.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\authentication.service.ts" />

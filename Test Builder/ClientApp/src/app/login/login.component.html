@@ -44,17 +44,18 @@
       </div>
     </div>  
   </div>
-  <div class="modal-footer">
-    <button type="submit" class="btn btn-sm btn-outline-primary" [disabled]="submitting">
-      <ng-container *ngIf="!submitting else Loading">
-        Submit
-      </ng-container>
-      <ng-template #Loading>
-        <div class="spinner-border spinner-border-sm"></div>
-        Submitting
-      </ng-template>
-    </button>
-    <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeModal.close()">Close</button>
+  <div class="modal-footer justify-content-start">
+      <a [routerLink]="[]" [queryParams]="{modal: 'register'}" class="link-primary">Register</a>
+      <button type="submit" class="btn btn-sm btn-outline-primary ms-auto" [disabled]="submitting">
+        <ng-container *ngIf="!submitting else Loading">
+          Submit
+        </ng-container>
+        <ng-template #Loading>
+          <div class="spinner-border spinner-border-sm"></div>
+          Submitting
+        </ng-template>
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeModal.close(0)">Close</button>
   </div>
 </form>
 

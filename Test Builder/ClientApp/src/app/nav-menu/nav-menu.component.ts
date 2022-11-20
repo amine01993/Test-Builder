@@ -1,11 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { AuthenticationData } from '../authentication.model';
 import { AuthenticationService } from '../authentication.service';
-import { LoginComponent } from '../login/login.component';
-import { RegisterComponent } from '../register/register.component';
+import { ModalService } from '../modal.service';
 
 @Component({
   selector: 'app-nav-menu',
@@ -21,8 +19,8 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private modal: NgbModal,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private modalService: ModalService,
   ) { }
 
   ngOnInit(): void {
@@ -30,9 +28,8 @@ export class NavMenuComponent implements OnInit, OnDestroy {
       next: queryParams => {
         if (queryParams.hasOwnProperty('modal')) {
           const modal = queryParams.modal;
-          this.showModal(modal);
+          this.modalService.open(modal);
         }
-        //console.log(queryParams)
       }
     });
 
@@ -53,21 +50,11 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     this.isExpanded = !this.isExpanded;
   }
 
-  showModal(modal: string): void {
-    switch (modal) {
-      case 'login':
-        this.modal.open(LoginComponent);
-        break;
-      case 'register':
-        this.modal.open(RegisterComponent);
-        break;
-    }
-  }
 
   Logout() {
     this.data.loggedIn = false;
     this.authService.removeToken();
-    this.router.navigate(['/']);
+    this.router.navigate([]);
   }
 
   ngOnDestroy(): void {
