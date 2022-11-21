@@ -1,4 +1,6 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Test } from './test.model';
 
 @Component({
   selector: 'app-test',
@@ -7,9 +9,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TestComponent implements OnInit {
 
-  constructor() { }
+  tests: Test[] = [];
+
+  constructor(
+    private httpClient: HttpClient,
+  ) { }
 
   ngOnInit(): void {
+    this.httpClient.get<Test[]>('api/test/list', { params: { auth: true } }).subscribe({
+      next: tests => {
+        console.log('tests list', tests);
+        this.tests = tests;
+      }
+    })
   }
 
 }

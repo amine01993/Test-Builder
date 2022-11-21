@@ -23,6 +23,15 @@ namespace Test_Builder.Controllers
             return new JsonResult(test);
         }
 
+        [HttpGet("list")]
+        [Authorize]
+        public IActionResult List([FromServices] ITestService testService, int id)
+        {
+            var tests = testService.List();
+
+            return new JsonResult(tests);
+        }
+
         // Post: api/test/add
         [HttpPost("add")]
         [Authorize]

@@ -41,6 +41,7 @@
     <None Remove="ClientApp\src\app\import-modal\requiredFileType.validator.ts" />
     <None Remove="ClientApp\src\app\modal.service.ts" />
     <None Remove="ClientApp\src\app\pipes\array.pipe.ts" />
+    <None Remove="ClientApp\src\app\pipes\format-date.ts" />
     <None Remove="ClientApp\src\app\pipes\object-length.pipe.ts" />
     <None Remove="ClientApp\src\app\pipes\split.pipe.ts" />
     <None Remove="ClientApp\src\app\question-add\question.model.ts" />
@@ -63,6 +64,9 @@
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\app\pipes\array.pipe.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\app\pipes\format-date.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\app\pipes\object-length.pipe.ts">

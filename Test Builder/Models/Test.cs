@@ -14,8 +14,11 @@ namespace Test_Builder.Models
         public string? Introduction { get; set; }
         [BelongToCustomer("category", "id", ErrorMessage = "This Category doesn't exist")]
         public int CategoryId { get; set; }
+        public Category? Category { get; set; }
+
         //public int? Limit { get; set; }
         public IEnumerable<Page>? Pages { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 
     public class UsedInTestConverter : JsonConverter<Test>

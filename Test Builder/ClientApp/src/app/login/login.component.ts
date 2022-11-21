@@ -34,7 +34,6 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('LoginComponent OnInit');
-    //this.activeModal.
   }
   
   RemoveError(key: string): void {

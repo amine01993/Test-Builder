@@ -1,8 +1,11 @@
+import { Category } from "../category/category.model";
 
 export interface Test {
   Id: number;
   Name: string;
+  Category: Category;
   Pages: Page[];
+  CreatedAt: Date;
 }
 
 export interface Page {

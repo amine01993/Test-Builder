@@ -39,6 +39,7 @@ import { AdminComponent } from './admin/admin.component';
 import { PreviewItemComponent } from './preview/preview-item/preview-item.component';
 import { ImportModalComponent } from './import-modal/import-modal.component';
 import { FileUploadComponent } from './file-upload/file-upload.component';
+import { FormatDatePipe } from './pipes/format-date';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { FileUploadComponent } from './file-upload/file-upload.component';
     QuestionAddComponent,
     SplitPipe,
     ObjectLengthPipe,
+    FormatDatePipe,
     ArrayPipe,
     MultipleChoiceAddComponent,
     TrueFalseAddComponent,
@@ -104,6 +106,7 @@ import { FileUploadComponent } from './file-upload/file-upload.component';
           { path: 'category', component: CategoryComponent },
           { path: 'test-add', component: TestAddComponent },
           { path: 'test-edit/:id', component: TestEditComponent },
+          { path: 'tests', component: TestComponent },
           { path: 'page-edit/:page-id', component: PageEditComponent },
           { path: 'question-bank/:page-id', component: QuestionBankComponent },
           { path: 'question-bank', component: QuestionBankComponent },

@@ -1,4 +1,5 @@
-﻿using Test_Builder.Models;
+﻿using Dapper;
+using Test_Builder.Models;
 
 namespace Test_Builder.Services
 {
@@ -36,6 +37,31 @@ namespace Test_Builder.Services
             );
 
             return test;
+        }
+
+        public IEnumerable<Test> List()
+        {
+            IEnumerable<Test> tests;
+            using(var connection = dBContext.Connection())
+            {
+                tests = connection.Query<Test, Category, Category, Test>(
+                    @"SELECT t.id AS Id, t.name AS Name, t.created_at AS CreatedAt,
+                        c.id AS Id, c.name AS Name,
+                        sc.id AS Id, sc.name AS Name
+                    FROM test t
+                    INNER JOIN category sc ON sc.id = t.category_id AND (sc.customer_id IS NULL OR sc.customer_id = @customer_id)
+                    INNER JOIN category c ON c.id = sc.parent_id AND (c.customer_id IS NULL OR c.customer_id = @customer_id)
+                    WHERE t.customer_id = @customer_id",
+                    (test, category, subCategory) =>
+                    {
+                        subCategory.Parent = category;
+                        test.Category = subCategory;
+                        return test;
+                    },
+                    new Dictionary<string, object> { { "customer_id", customer_id } }
+                );
+            }
+            return tests;
         }
 
         public int Add(Test test)

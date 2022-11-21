@@ -1,1 +1,44 @@
-<p>test works!</p>
+<div class="row g-4">
+  <!-- bread crumb -->
+  <div class="col-12">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/admin">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Tests</li>
+      </ol>
+    </nav>
+  </div>
+  <!-- title -->
+  <div>
+    <h3>
+      <i class="bi bi-list-task"></i>
+      Tests
+    </h3>
+  </div>
+  <div class="col-12">
+    <table class="table table-hover">
+      <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Date created</th>
+        <th></th>
+      </tr>
+      <tr *ngFor="let test of tests;">
+        <td>{{ test.Name }}</td>
+        <td>{{ test.Category.Parent!.Name + ' > ' + test.Category.Name }}</td>
+        <td>{{ test.CreatedAt|formatDate }}</td>
+        <td>
+          <a title="Edit Test" class="btn btn-sm btn-outline-success me-1 py-1" [routerLink]="['/admin', 'test-edit', test.Id]">
+            <i class="bi bi-pencil-fill"></i>
+          </a>
+          <button title="Duplicate Test" class="btn btn-sm btn-outline-secondary me-1 py-1">
+              <i class="bi bi-files"></i>
+          </button>
+          <button title="Delete Test" class="btn btn-sm btn-outline-danger py-1">
+              <i class="bi bi-trash-fill"></i>
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
