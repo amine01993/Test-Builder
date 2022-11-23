@@ -36,19 +36,19 @@
               </a>
             </li>
             <li class="nav-item" routerLinkActive="link-active">
-              <a class="nav-link text-dark" href="javascript:void(0)" title="Logout" (click)="Logout()">
+              <a class="nav-link text-dark" title="Logout" (click)="Logout($event)">
                 <i class="bi bi-box-arrow-right"></i>
               </a>
             </li>
           </ng-container>
           <ng-template #Anonymous>
             <li class="nav-item" routerLinkActive="link-active">
-              <a [routerLink]="[]" [queryParams]="{modal: 'login'}" class="nav-link text-dark" title="Login">
+              <a [routerLink]="[]" [queryParams]="{modal: 'login'}" [queryParamsHandling]="'merge'" class="nav-link text-dark" title="Login">
                 <i class="bi bi-person-fill"></i>
               </a>
             </li>
             <li class="nav-item" routerLinkActive="link-active">
-              <a [routerLink]="[]" [queryParams]="{modal: 'register'}" class="nav-link text-dark" href="javascript:void(0)" title="Register">
+              <a [routerLink]="[]" [queryParams]="{modal: 'register'}" [queryParamsHandling]="'merge'" class="nav-link text-dark" title="Register">
                 <i class="bi bi-person-plus-fill"></i>
               </a>
             </li>

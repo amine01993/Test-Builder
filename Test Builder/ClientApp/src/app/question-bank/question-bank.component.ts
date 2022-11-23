@@ -60,6 +60,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.params.subscribe({
       next: params => {
+        console.log('params');
         const pageId = +params['page-id'];
         if (pageId) {
           //this.httpClient.get<{ page: Page }>('api/test/' + params['id'], { params: { auth: true } }).subscribe({
@@ -76,7 +77,6 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
         this.questionTypes = types;
       }
     });
-    this.questionService.LoadQuestionTypes();
 
     this.categorySub = this.categoryService.categories.subscribe({
       next: categories => {
@@ -85,10 +85,13 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
         this.OnCategoryChange();
       }
     });
-    this.categoryService.LoadCategories();
 
     this.route.queryParams.subscribe({
       next: queryParams => {
+        console.log('queryParams');
+        this.questionService.LoadQuestionTypes();
+        this.categoryService.LoadCategories();
+
         this.page = queryParams.hasOwnProperty('page') ? +queryParams['page'] : 1;
         this.pageSize = queryParams.hasOwnProperty('pageSize') ? +queryParams['pageSize'] : 10;
 
@@ -208,7 +211,8 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
         page: this.page,
         //pageSize: this.pageSize,
         selected: this.getSelectedQuestionIds(),
-      }
+      },
+      queryParamsHandling: 'merge',
     });
   }
 
@@ -219,7 +223,8 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
         page: this.page - 1,
         //pageSize: this.pageSize,
         selected: this.getSelectedQuestionIds(),
-      }
+      },
+      queryParamsHandling: 'merge',
     });
   }
 
@@ -230,7 +235,8 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
         page: this.page + 1,
         //pageSize: this.pageSize,
         selected: this.getSelectedQuestionIds(),
-      }
+      },
+      queryParamsHandling: 'merge',
     });
   }
 
@@ -242,7 +248,8 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
         page: 1,
         pageSize: this.pageSize,
         selected: this.getSelectedQuestionIds(),
-      }
+      },
+      queryParamsHandling: 'merge',
     });
   }
 
@@ -304,8 +311,10 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
 
       this.router.navigate(['/admin/question-bank'], {
         queryParams: {
+          page: 1,
           _filter: this.encodeParam(this.filter)
-        }
+        },
+        queryParamsHandling: 'merge',
       });
     }
   }

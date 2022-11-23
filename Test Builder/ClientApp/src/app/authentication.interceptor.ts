@@ -18,14 +18,27 @@ export class AuthenticationInteceptor implements HttpInterceptor {
       const editedReqObservable = next.handle(editedReq);
       return editedReqObservable.pipe(catchError((error: HttpErrorResponse) => {
         if (error.status === HttpStatusCode.Unauthorized) {
+          this.authService.removeToken();
           //console.log('error response', error);
-          const modalRef = this.modalService.open('login');
-          modalRef?.result.then(result => {
-            if (result === 1) {
-              window.location.reload();
-            }
-          });
-          this.router.navigate([], { queryParams: { modal: 'login' } });
+          if (this.modalService.opened('register')) {
+            const modalRef = this.modalService.get('register');
+            modalRef?.result.then(result => {
+              if (result === 1) {
+                this.router.navigate([], { queryParams: { modal: '' }, queryParamsHandling: 'merge' });
+                //window.location.reload();
+              }
+            });
+          }
+          else {
+            const modalRef = this.modalService.open('login');
+            modalRef?.result.then(result => {
+              if (result === 1) {
+                this.router.navigate([], { queryParams: { modal: '' }, queryParamsHandling: 'merge' });
+                //window.location.reload();
+              }
+            });
+            this.router.navigate([], { queryParams: { modal: 'login' }, queryParamsHandling: 'merge' });
+          }
         }
         return throwError(error);
       }));

@@ -8,25 +8,21 @@ import { QuestionType } from "./question.model";
 })
 export class QuestionService {
   questionTypes: Subject<QuestionType[]> = new Subject;
+  loadedTypes: boolean = false;
 
   constructor(
     private httpClient: HttpClient
   ) { }
 
   LoadQuestionTypes() {
-    //this.questionTypes.next([
-    //  { name: 'Multiple Choice', icon: 'card-checklist', link: 'multiple-choice' },
-    //  { name: 'True False', icon: 'check|x', link: 'true-false' },
-    //  { name: 'Matching', icon: 'arrow-left-right', link: 'matching' },
-    //  { name: 'Free Text', icon: 'input-cursor-text', link: 'free-text' },
-    //  { name: 'Essay', icon: 'justify-left', link: 'essay' }
-    //]);
-
-    this.httpClient.get<QuestionType[]>('api/question/types').subscribe({
-      next: questionTypes => {
-        this.questionTypes.next(questionTypes);
-      }
-    });
+    if (!this.loadedTypes) {
+      this.httpClient.get<QuestionType[]>('api/question/types').subscribe({
+        next: questionTypes => {
+          this.loadedTypes = true;
+          this.questionTypes.next(questionTypes);
+        }
+      });
+    }
   }
 }
 

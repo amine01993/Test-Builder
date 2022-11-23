@@ -69,7 +69,7 @@
     </div>
   </div>
   <div class="modal-footer justify-content-start">
-    <a [routerLink]="[]" [queryParams]="{modal: 'login'}" class="link-primary">Login</a>
+    <a [routerLink]="[]" [queryParams]="{modal: 'login'}" [queryParamsHandling]="'merge'" class="link-primary">Login</a>
     <button type="submit" class="ms-auto btn btn-sm btn-outline-primary">Submit</button>
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeModal.close()">Close</button>
   </div>

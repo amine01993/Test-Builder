@@ -45,7 +45,7 @@
     </div>  
   </div>
   <div class="modal-footer justify-content-start">
-      <a [routerLink]="[]" [queryParams]="{modal: 'register'}" class="link-primary">Register</a>
+      <a [routerLink]="[]" [queryParams]="{modal: 'register'}" [queryParamsHandling]="'merge'" class="link-primary">Register</a>
       <button type="submit" class="btn btn-sm btn-outline-primary ms-auto" [disabled]="submitting">
         <ng-container *ngIf="!submitting else Loading">
           Submit

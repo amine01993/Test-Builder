@@ -51,10 +51,11 @@ export class NavMenuComponent implements OnInit, OnDestroy {
   }
 
 
-  Logout() {
+  Logout(event: MouseEvent) {
+    event.preventDefault();
     this.data.loggedIn = false;
     this.authService.removeToken();
-    this.router.navigate([]);
+    this.router.navigate([], { queryParamsHandling: 'merge' });
   }
 
   ngOnDestroy(): void {
