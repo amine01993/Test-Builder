@@ -70,7 +70,6 @@ namespace Test_Builder.Services
             {
                 var result = connection.Query<T>(sql, new DynamicParameters(parameters));
                 
-                //connection.Query<Question, Category, Question>(sql, );
                 return result;
             }
         }

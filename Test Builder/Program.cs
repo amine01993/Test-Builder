@@ -5,11 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Serialization;
 
 using Test_Builder.Services;
-using Test_Builder.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
-
-//builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddControllers(options =>
 {
@@ -23,16 +20,15 @@ builder.Services.AddControllers(options =>
 
 // Add services to the container.
 builder.Services.AddSingleton<IDBContext, DBContext>();
-//builder.Services.AddSingleton<IDBHelper, DBHelper>();
-builder.Services.AddSingleton<ITokenService, TokenService>();
-builder.Services.AddSingleton<ICustomerService, CustomerService>();
-builder.Services.AddSingleton<IQuestionService, QuestionService>();
-builder.Services.AddSingleton<IQuestionTypeService, QuestionTypeService>();
-builder.Services.AddSingleton<ICategoryService, CategoryService>();
-builder.Services.AddSingleton<IPageQuestionService, PageQuestionService>();
-builder.Services.AddSingleton<IPageService, PageService>();
-builder.Services.AddSingleton<ITestService, TestService>();
-builder.Services.AddSingleton<IPreviewService, PreviewService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<IQuestionTypeService, QuestionTypeService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IPageQuestionService, PageQuestionService>();
+builder.Services.AddScoped<IPageService, PageService>();
+builder.Services.AddScoped<ITestService, TestService>();
+builder.Services.AddScoped<IPreviewService, PreviewService>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
 

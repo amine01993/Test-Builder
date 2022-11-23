@@ -56,7 +56,7 @@ export class PageSettingsComponent implements OnInit {
 
   private getTimeLimit() {
     if (this.pageForm.value.timeLimit) {
-      const limit = this.timeUnit === 'Seconds' ? (+this.pageForm.value.limit) : (+this.pageForm.value.limit) * 60;
+      const limit = this.timeUnit === 'Seconds' ? (+this.pageForm.value.limit) : parseInt((+this.pageForm.get('limit')?.value) * 60 + '');
       return limit;
     }
     return null;
@@ -66,14 +66,14 @@ export class PageSettingsComponent implements OnInit {
     switch (this.timeUnit) {
       case 'Seconds':
         if (this.pageForm.get('limit')?.valid) {
-          const limit = Math.floor((+this.pageForm.get('limit')?.value) / 60);
+          const limit = parseFloat(((+this.pageForm.get('limit')?.value) / 60).toPrecision(2));
           this.pageForm.patchValue({ limit });
         }
         this.timeUnit = 'Minutes';
         break;
       case 'Minutes':
         if (this.pageForm.get('limit')?.valid) {
-          const limit = (+this.pageForm.get('limit')?.value) * 60;
+          const limit = parseInt((+this.pageForm.get('limit')?.value) * 60 + '');
           this.pageForm.patchValue({ limit });
         }
         this.timeUnit = 'Seconds';
