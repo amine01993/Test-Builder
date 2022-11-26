@@ -26,11 +26,14 @@ namespace Test_Builder.Controllers
         }
 
         // Get: api/question/search
-        [HttpGet("search")]
+        [HttpGet("search/{pageId?}")]
         [Authorize]
-        public IActionResult Search([FromServices] IQuestionService questionService, [FromQuery] DataParameters parameters)
+        public IActionResult Search(
+            [FromServices] IQuestionService questionService, 
+            [FromQuery] DataParameters parameters, int? pageId
+        )
         {
-            var result = questionService.Search(parameters);
+            var result = questionService.Search(parameters, pageId.GetValueOrDefault());
 
             return new JsonResult(result);
         }

@@ -102,10 +102,11 @@ namespace Test_Builder.Services
             return questions;
         }
 
-        public DataResult<Question> Search(DataParameters parameters)
+        public DataResult<Question> Search(DataParameters parameters, int pageId = 0)
         {
+            var pageFilter = pageId > 0 ? " AND pq.page_id IS NULL OR pq.page_id != @page_id" : "";
             var sql =
-                @"SELECT q.id AS Id, q.question AS _Question, q.selection AS Selection,
+                $@"SELECT q.id AS Id, q.question AS _Question, q.selection AS Selection,
                     q.type_id AS TypeId
 
                 FROM question q
@@ -116,11 +117,12 @@ namespace Test_Builder.Services
                 INNER JOIN question_type qt ON qt.id = q.type_id #questionType
                 
                 LEFT JOIN page_question pq ON pq.question_id = q.id AND pq.customer_id = @customer_id #status
-                WHERE q.customer_id = @customer_id #searchTerm";
-
+                WHERE q.customer_id = @customer_id {pageFilter} #searchTerm";
 
             var sqlParameters = new Dictionary<string, object>()
             { { "customer_id", customer_id } };
+            if (pageId > 0)
+                sqlParameters.Add("page_id", pageId);
 
             IDictionary<string, string> filter = parameters.decodeFilter();
             //IDictionary<string, string> orderBy = parameters.decodeParam(parameters._orderBy);

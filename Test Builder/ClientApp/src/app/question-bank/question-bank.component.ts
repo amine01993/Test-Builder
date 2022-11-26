@@ -18,6 +18,7 @@ import { QuestionService } from '../question-add/question.service';
 })
 export class QuestionBankComponent implements OnInit, OnDestroy {
 
+  pageId: number = 0;
   questionTypes: QuestionType[] = [];
   categories: Category[] = [];
   _categories: Category[] = [];
@@ -63,6 +64,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
         console.log('params');
         const pageId = +params['page-id'];
         if (pageId) {
+          this.pageId = pageId;
           //this.httpClient.get<{ page: Page }>('api/test/' + params['id'], { params: { auth: true } }).subscribe({
           //  next: data => {
           //    this.page = data.page;
@@ -183,7 +185,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
   }
 
   LoadData(): void {
-    this.httpClient.get<DataResult<Question>>('api/question/search', {
+    this.httpClient.get<DataResult<Question>>('api/question/search' + (this.pageId ? '/' + this.pageId : ''), {
       params: {
         auth: true,
         page: this.page, pageSize: this.pageSize,
@@ -250,6 +252,17 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
         selected: this.getSelectedQuestionIds(),
       },
       queryParamsHandling: 'merge',
+    });
+  }
+
+  AddToPage(event: MouseEvent): void {
+    event.preventDefault();
+    if (this.selectedQuestions.length === 0 || !this.pageId)
+      return;
+    this.httpClient.post<any>('api/page-question/add/' + this.pageId, this.selectedQuestions, { params: { auth: true } }).subscribe({
+      next: (data) => {
+        this.LoadData();
+      }
     });
   }
 

@@ -8,7 +8,7 @@ namespace Test_Builder.Services
     {
         public Question? Get(int questionId);
         public IEnumerable<Question> Get(IEnumerable<int> ids);
-        public DataResult<Question> Search(DataParameters parameters);
+        public DataResult<Question> Search(DataParameters parameters, int pageId = 0);
         public int Insert(Question question);
         public void Update(Question question);
         public int? Duplicate(int questionId);

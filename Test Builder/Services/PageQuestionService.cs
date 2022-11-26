@@ -15,6 +15,31 @@ namespace Test_Builder.Services
             customer_id = int.Parse(httpContextAccessor.HttpContext.User.Identity.Name);
         }
 
+        public IEnumerable<int> GetUsedQuestions(IEnumerable<int> questionIds, int pageId)
+        {
+            var testId = dBContext.GetScalar<int>(
+                "SELECT test_id FROM page WHERE id = @page_id AND customer_id = @customer_id",
+                new Dictionary<string, object> { { "page_id", pageId }, { "customer_id", customer_id } }
+            );
+            // list all questions in questionIds that are in the test
+            var parameters = new Dictionary<string, object> { { "test_id", testId }, { "customer_id", customer_id } };
+            var parmertersList = new List<string>();
+            foreach (var questionId in questionIds)
+            {
+                parameters.Add("question_" + questionId, questionId);
+                parmertersList.Add("@question_" + questionId);
+            }
+            var existantQuestionIds = dBContext.List<int>(
+                $@"SELECT pq.question_id
+                FROM page_question pq
+                INNER JOIN page p on p.id = pq.page_id AND p.test_id = @test_id AND p.customer_id = @customer_id
+                WHERE pq.question_id in ({string.Join(',', parmertersList)}) AND pq.customer_id = @customer_id",
+                parameters
+            );
+
+            return existantQuestionIds;
+        }
+
         public int Insert(PageQuestion pageQuestion)
         {
             var id = (int)dBContext.Write(@"

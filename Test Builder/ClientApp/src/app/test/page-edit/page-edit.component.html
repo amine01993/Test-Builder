@@ -39,7 +39,9 @@
         <li>
           <a class="dropdown-item" [routerLink]="['/admin', 'add-question', page!.Id]">Add a new question</a>
         </li>
-        <li><button class="dropdown-item" type="button">Reuse from your question bank</button></li>
+        <li>
+          <a class="dropdown-item" [routerLink]="['/admin', 'question-bank', page!.Id]">Reuse from your question bank</a>
+        </li>
         <li><button class="dropdown-item" type="button">Add random questions</button></li>
       </ul>
 

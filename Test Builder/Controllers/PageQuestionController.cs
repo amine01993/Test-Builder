@@ -33,5 +33,30 @@ namespace Test_Builder.Controllers
 
             return new JsonResult(null);
         }
+
+        // Post: api/page-question/add
+        [HttpPost("add/{pageId}")]
+        [Authorize]
+        public IActionResult Add(
+            [FromServices] IPageQuestionService pageQuestionService,
+            IEnumerable<int> questionIds, int pageId
+        )
+        {
+            var existantQuestionIds = pageQuestionService.GetUsedQuestions(questionIds, pageId);
+            var position = pageQuestionService.MaxPosition(pageId);
+            // add these questions to the page
+            foreach(var questionId in questionIds)
+            {
+                if (existantQuestionIds.Contains(questionId))
+                    continue;
+                pageQuestionService.Insert(new PageQuestion() { 
+                    PageId = pageId,
+                    QuestionId = questionId,
+                    Position = position++,
+                });
+            }
+            
+            return new JsonResult(null);
+        }
     }
 }

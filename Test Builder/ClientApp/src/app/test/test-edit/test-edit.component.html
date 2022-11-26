@@ -59,15 +59,7 @@
             </ng-container>
           </div>
           <div class="col-4 pe-0 text-end">
-            <!--<button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="add-question-menu" data-bs-toggle="dropdown" aria-expanded="false">
-              Add Question
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="add-question-menu">
-              <li><button class="dropdown-item" type="button">Add a new question</button></li>
-              <li><button class="dropdown-item" type="button">Reuse from your question bank</button></li>
-              <li><button class="dropdown-item" type="button">Add random questions</button></li>
-            </ul>
-            &nbsp;-->
+
             <a class="btn btn-sm btn-success me-1" role="button" [routerLink]="['/admin', 'page-edit', page.Id]">
               <i class="bi bi-pencil-fill"></i>
             </a>
@@ -88,101 +80,5 @@
     </div>
   </div>
 
-  <!-- question filter -->
-  <!--<div class="col-12">
-    <form [formGroup]="filterForm" #form="ngForm" (ngSubmit)="OnFilterSubmit()">
-      <div class="card">
-        <div class="card-body">
-          <div class="row row align-items-end">
-            <div class="col">
-              <label for="status" class="form-label">Status</label>
-              <select class="form-select form-select-sm" id="status" formControlName="status">
-                <option [value]="0">All</option>
-                <option [value]="1">Used</option>
-                <option [value]="2">Unused</option>
-              </select>
-            </div>
-            <div class="col">
-              <label for="questionType" class="form-label">Question Type</label>
-              <select class="form-select form-select-sm" id="questionType" formControlName="questionType">
-                <option [value]="0">All</option>
-                <option *ngFor="let option of questionTypes" [value]="option.Id">{{ option.Name }}</option>
-              </select>
-            </div>
-
-            <div class="col">
-              <label for="category" class="form-label">Category</label>
-              <select class="form-select form-select-sm" id="category"
-                      (change)="OnCategoryChange()" formControlName="category">
-                <option [value]="0">All</option>
-                <option *ngFor="let option of _categories" [value]="option.Id">{{ option.Name }}</option>
-              </select>
-            </div>
-
-            <div class="col">
-              <label for="subCategory" class="form-label">SubCategory</label>
-              <select class="form-select form-select-sm" id="subCategory" formControlName="subCategory">
-                <option [value]="0">All</option>
-                <option *ngFor="let option of _subCategories" [value]="option.Id">{{ option.Name }}</option>
-              </select>
-            </div>
-
-            <div class="col">
-              <label for="searchTerm" class="form-label">Search Term</label>
-              <input class="form-control form-control-sm" id="searchTerm" formControlName="searchTerm" />
-            </div>
-
-            <div class="col">
-              <button class="btn btn-sm btn-outline-success">
-                <ng-container *ngIf="!searching else Searching">
-                  Search <i class="bi bi-search"></i>
-                </ng-container>
-                <ng-template #Searching>
-                  <span class="spinning-border spinning-border-sm" role="status"></span>
-                  Searching...
-                </ng-template>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>-->
-  <!-- question list -->
-  <!--<div *ngFor="let question of questions" class="col-12">
-    <div class="card">
-      <div class="card-header">
-        <div class="row align-items-center">
-          <div class="col-4">
-            <h5 class="mb-0">Question</h5>
-          </div>
-          <div class="col-6" style="text-align: center;">
-            {{ question.CategoryName }}
-            <i style="font-size: 0.7rem;" class="bi bi-chevron-double-right"></i>
-            {{ question.SubCategoryName }}
-          </div>
-          <div class="col-2 float-end" style="text-align: right;">
-            {{ question.Points }} {{ question.Points > 1 ? 'pts' : 'pt' }}
-          </div>
-        </div>
-      </div>
-      <div class="card-body">
-        <span [innerHTML]="question.Question"></span>
-
-        <div class="row question-actions mt-3 pt-2 mx-1 align-items-center">
-          <div class="col-8 ps-0">
-            <button class="btn btn-sm btn-link">Answers</button> |
-            <button class="btn btn-sm btn-link">Edit</button> |
-            <button class="btn btn-sm btn-link">Duplicate</button> |
-            <button class="btn btn-sm btn-link">Used in</button> |
-            <button class="btn btn-sm btn-link">Reorder</button>
-          </div>
-          <div class="col-4 pe-0">
-            <button class="btn btn-sm btn-outline-success float-end">Add To Test</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>-->
 </div>
 
